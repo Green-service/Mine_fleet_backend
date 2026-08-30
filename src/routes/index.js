@@ -1,170 +1,151 @@
 import { Router } from "express";
-import { env } from "../config/env.js";
 import { usingSupabase } from "../config/env.js";
+import { persistenceStatus } from "../services/store.js";
+import { inviteUser, listHubUsers, publicInvite, refreshRoleUserCounts, revokeHubUser, updateHubUser } from "../services/inviteService.js";
+import { clockEmployee, getHrData } from "../services/hrService.js";
 import * as catalog from "../data/catalog.js";
-import { insertRow } from "../services/store.js";
+import { authRouter } from "./auth.js";
+import { productionRouter } from "./production.js";
+import { fleetRouter } from "./fleet.js";
+import { dieselRouter } from "./diesel.js";
+import { maintenanceRouter } from "./maintenance.js";
+import { breakdownsRouter } from "./breakdowns.js";
+import { safetyRouter } from "./safety.js";
+import { procurementRouter } from "./procurement.js";
+import { financeRouter } from "./finance.js";
+import { settingsRouter } from "./settings.js";
+import { overviewRouter } from "./overview.js";
 
 export const router = Router();
 
-router.get("/health", (_req, res) => {
-  res.json({ ok: true, supabase: usingSupabase, time: new Date().toISOString() });
-});
+router.use("/auth", authRouter);
 
-router.post("/auth/login", (req, res) => {
-  const email = String(req.body?.email || "").trim().toLowerCase();
-  const password = String(req.body?.password || "");
-  if (email === env.demoEmail.toLowerCase() && password === env.demoPassword) {
-    return res.json({ token: "demo-session", user: catalog.sessionUser });
-  }
-  res.status(401).json({ error: "Invalid email or password" });
+router.get("/health", (_req, res) => {
+  res.json({
+    ok: true,
+    supabase: usingSupabase,
+    persistence: persistenceStatus(),
+    time: new Date().toISOString(),
+  });
 });
 
 router.get("/session", (_req, res) => {
   res.json({ user: catalog.sessionUser, sites: catalog.sites, notifications: catalog.notifications, activity: catalog.activity });
 });
 
-router.get("/overview", (_req, res) => res.json(catalog.overview));
+router.use("/overview", overviewRouter);
 
-router.get("/production", (_req, res) => {
-  res.json({
-    summary: catalog.productionSummary,
-    daily: catalog.productionDaily,
-    machineHoursBlf: catalog.machineHoursBlf,
-  });
+router.use("/production", productionRouter);
+router.use("/fleet", fleetRouter);
+router.use("/diesel", dieselRouter);
+router.use("/maintenance", maintenanceRouter);
+router.use("/breakdowns", breakdownsRouter);
+router.use("/safety", safetyRouter);
+router.use("/procurement", procurementRouter);
+router.use("/finance", financeRouter);
+router.use("/settings", settingsRouter);
+
+router.get("/hr", async (_req, res, next) => {
+  try {
+    refreshRoleUserCounts();
+    res.json(
+      await getHrData({
+        roles: catalog.roles,
+        invites: catalog.invitedUsers.map(publicInvite),
+        users: listHubUsers(),
+      }),
+    );
+  } catch (err) {
+    next(err);
+  }
 });
 
-router.post("/production", (req, res) => {
-  const row = {
-    date: new Date().toLocaleDateString("en-GB"),
-    site: req.body.site || "GG",
-    target: Number(req.body.target || 0),
-    actual: Number(req.body.actual || 0),
-    challenges: req.body.challenges || "Captured from hub",
-  };
-  catalog.productionDaily.unshift(row);
-  res.status(201).json(row);
-});
+function nextRoleCode(roles) {
+  const used = roles
+    .map((role) => Number(String(role.code || "").replace(/^R/i, "")))
+    .filter((n) => Number.isFinite(n) && n > 0);
+  return `R${String((used.length ? Math.max(...used) : 0) + 1).padStart(3, "0")}`;
+}
 
-router.get("/fleet", (_req, res) => {
-  res.json({ equipment: catalog.equipment, categories: catalog.fleetCategories });
-});
-
-router.get("/diesel", (_req, res) => {
-  res.json({
-    kpis: catalog.dieselKpis,
-    byMachine: catalog.dieselByMachine,
-    issues: catalog.dieselIssues,
-    alerts: catalog.dieselAlerts,
-    recon: catalog.dieselRecon,
-  });
-});
-
-router.post("/diesel", (req, res) => {
-  const litres = Number(req.body.litres || 0);
-  const row = {
-    date: new Date().toLocaleDateString("en-GB"),
-    time: new Date().toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" }),
-    site: req.body.site || "Grootegeluk",
-    machine: req.body.machine || "",
-    operator: req.body.operator || "",
-    opening: Number(req.body.opening || 0),
-    closing: Number(req.body.closing || 0),
-    litres,
-    approvedBy: "Pending",
-  };
-  catalog.dieselIssues.unshift(row);
-  res.status(201).json(row);
-});
-
-router.get("/maintenance", (_req, res) => {
-  res.json({
-    workOrders: catalog.workOrders,
-    attention: catalog.attentionMachines,
-    servicePlan: catalog.servicePlan,
-  });
-});
-
-router.get("/breakdowns", (_req, res) => res.json({ items: catalog.breakdowns }));
-
-router.post("/breakdowns", (req, res) => {
-  const row = {
-    machine: req.body.machine,
-    failure: req.body.failure,
-    downtime: req.body.downtime || "Just reported",
-    severity: req.body.severity || "Moderate",
-    parts: req.body.parts || "TBC",
-    status: "Investigation",
-    site: req.body.site || "Grootegeluk",
-  };
-  catalog.breakdowns.unshift(row);
-  res.status(201).json(row);
-});
-
-router.get("/safety", (_req, res) => {
-  res.json({ kpis: catalog.safetyKpis, actions: catalog.safetyActions });
-});
-
-router.post("/safety", (req, res) => {
-  const row = {
-    source: req.body.source || "Incident",
-    action: req.body.description || req.body.action,
-    owner: req.body.owner || "SHEQ Department",
-    due: req.body.due || "Open",
-    status: "Open",
-    priority: req.body.severity || "Medium",
-  };
-  catalog.safetyActions.unshift(row);
-  res.status(201).json(row);
-});
-
-router.get("/hr", (_req, res) => {
-  res.json({
-    employees: catalog.employees,
-    roles: catalog.roles,
-    leave: catalog.leave,
-    claims: catalog.claims,
-  });
-});
-
-router.post("/hr/clock", (req, res) => {
+router.post("/hr/roles", (req, res) => {
   const row = {
     id: crypto.randomUUID(),
+    code: req.body.code || nextRoleCode(catalog.roles),
     name: req.body.name,
-    number: req.body.number,
-    title: "Manual entry",
-    site: req.body.site,
-    shift: req.body.shift,
-    clockIn: req.body.clockIn || "—",
-    clockOut: req.body.clockOut || "—",
-    hours: "Pending",
-    rate: 0,
-    status: "Pending approval",
-    role: "Plant Operator",
-    salary: 0,
+    slug: req.body.slug,
+    category: req.body.category || "Operations",
+    description: req.body.description,
+    users: 0,
+    modules: req.body.modules || 0,
+    status: req.body.status || "Active",
+    permissions: req.body.permissions || {},
+    employees: [],
   };
-  catalog.employees.unshift(row);
+  catalog.roles.push(row);
   res.status(201).json(row);
 });
 
-router.get("/procurement", (_req, res) => {
-  res.json({ orders: catalog.purchaseOrders, requests: catalog.purchaseRequests });
+router.patch("/hr/roles/:id", (req, res) => {
+  const role = catalog.roles.find((item) => item.id === req.params.id);
+  if (!role) return res.status(404).json({ error: "Role not found" });
+  Object.assign(role, {
+    code: req.body.code ?? role.code,
+    name: req.body.name ?? role.name,
+    slug: req.body.slug ?? role.slug,
+    description: req.body.description ?? role.description,
+    status: req.body.status ?? role.status,
+    permissions: req.body.permissions ?? role.permissions,
+    modules: req.body.modules ?? role.modules,
+  });
+  res.json(role);
 });
 
-router.post("/procurement/requests", (req, res) => {
-  const row = {
-    request: `PR-2026-${String(80 + catalog.purchaseRequests.length).padStart(3, "0")}`,
-    department: req.body.department || "Engineering",
-    machine: req.body.machine || "—",
-    item: req.body.item,
-    value: Number(req.body.value || 0),
-    status: "Awaiting Approval",
-  };
-  catalog.purchaseRequests.unshift(row);
-  res.status(201).json(row);
+router.delete("/hr/roles/:id", (req, res) => {
+  const index = catalog.roles.findIndex((item) => item.id === req.params.id);
+  if (index < 0) return res.status(404).json({ error: "Role not found" });
+  if (catalog.roles[index].slug === "super-admin") {
+    return res.status(400).json({ error: "Super Admin cannot be removed." });
+  }
+  catalog.roles.splice(index, 1);
+  res.json({ ok: true });
 });
 
-router.get("/finance", (_req, res) => {
-  res.json({ kpis: catalog.financeKpis, machines: catalog.machineCosts });
+router.patch("/hr/users/:id", (req, res, next) => {
+  try {
+    res.json(updateHubUser(req.params.id, req.body || {}));
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.delete("/hr/users/:id", (req, res, next) => {
+  try {
+    res.json(revokeHubUser(req.params.id));
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.post("/hr/invites", async (req, res, next) => {
+  try {
+    const row = await inviteUser({
+      name: req.body.name,
+      email: req.body.email,
+      role: req.body.role,
+      site: req.body.site,
+    });
+    res.status(201).json(row);
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.post("/hr/clock", async (req, res, next) => {
+  try {
+    res.status(201).json(await clockEmployee(req.body || {}));
+  } catch (err) {
+    next(err);
+  }
 });
 
 router.get("/reports", (_req, res) => {
@@ -181,5 +162,3 @@ router.get("/reports", (_req, res) => {
     ],
   });
 });
-
-void insertRow;

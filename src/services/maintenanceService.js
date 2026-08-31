@@ -187,7 +187,7 @@ export async function bookService(body, actor = null) {
     ].join("\n\n"),
   });
 
-  return { ...row, vehicleLabel, dueDate: formatDmyLong(dueDate), emailsSent: true };
+  return { ...row, vehicleLabel, dueDate: formatDmyLong(dueDate) };
 }
 
 export async function createWorkOrder(body, actor = null) {

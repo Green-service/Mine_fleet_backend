@@ -13,7 +13,18 @@ if (!usingSupabase) {
 syncBusinessCatalog(await readBusinessRows());
 
 const app = express();
-app.use(cors({ origin: env.clientOrigin, credentials: true }));
+const corsOrigins = new Set(
+  [env.clientOrigin, "https://localhost", "capacitor://localhost", "http://localhost"].filter(Boolean),
+);
+app.use(
+  cors({
+    origin(origin, callback) {
+      if (!origin || corsOrigins.has(origin)) return callback(null, true);
+      return callback(new Error(`CORS blocked: ${origin}`));
+    },
+    credentials: true,
+  }),
+);
 app.use(express.json({ limit: "20mb" }));
 app.use("/api", router);
 app.use(notFound);

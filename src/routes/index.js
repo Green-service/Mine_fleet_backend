@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { usingSupabase } from "../config/env.js";
 import { persistenceStatus } from "../services/store.js";
+import { storageStatus } from "../services/storageService.js";
 import { inviteUser, listHubUsers, publicInvite, refreshRoleUserCounts, revokeHubUser, updateHubUser } from "../services/inviteService.js";
 import { clockEmployee, getHrData } from "../services/hrService.js";
 import * as catalog from "../data/catalog.js";
@@ -15,6 +16,12 @@ import { procurementRouter } from "./procurement.js";
 import { financeRouter } from "./finance.js";
 import { settingsRouter } from "./settings.js";
 import { overviewRouter } from "./overview.js";
+import { businessesRouter } from "./businesses.js";
+import { assetsRouter } from "./assets.js";
+import { driversRouter } from "./drivers.js";
+import { logRouter } from "./log.js";
+import { documentsRouter } from "./documents.js";
+import { listActivity, listNotifications, listSites } from "../services/inboxService.js";
 
 export const router = Router();
 
@@ -24,16 +31,31 @@ router.get("/health", (_req, res) => {
   res.json({
     ok: true,
     supabase: usingSupabase,
+    storage: storageStatus(),
     persistence: persistenceStatus(),
     time: new Date().toISOString(),
   });
 });
 
-router.get("/session", (_req, res) => {
-  res.json({ user: catalog.sessionUser, sites: catalog.sites, notifications: catalog.notifications, activity: catalog.activity });
+router.get("/session", async (_req, res, next) => {
+  try {
+    const [notifications, activity, sites] = await Promise.all([
+      listNotifications(),
+      listActivity(),
+      listSites(),
+    ]);
+    res.json({ user: catalog.sessionUser, sites, notifications, activity });
+  } catch (err) {
+    next(err);
+  }
 });
 
 router.use("/overview", overviewRouter);
+router.use("/businesses", businessesRouter);
+router.use("/assets", assetsRouter);
+router.use("/drivers", driversRouter);
+router.use("/log", logRouter);
+router.use("/documents", documentsRouter);
 
 router.use("/production", productionRouter);
 router.use("/fleet", fleetRouter);
@@ -103,8 +125,8 @@ router.patch("/hr/roles/:id", (req, res) => {
 router.delete("/hr/roles/:id", (req, res) => {
   const index = catalog.roles.findIndex((item) => item.id === req.params.id);
   if (index < 0) return res.status(404).json({ error: "Role not found" });
-  if (catalog.roles[index].slug === "super-admin") {
-    return res.status(400).json({ error: "Super Admin cannot be removed." });
+  if (catalog.roles[index].slug === "super-admin" || catalog.roles[index].slug === "driver") {
+    return res.status(400).json({ error: "Built-in roles cannot be removed." });
   }
   catalog.roles.splice(index, 1);
   res.json({ ok: true });

@@ -30,7 +30,7 @@ export function listHubUsers() {
     name: catalog.sessionUser.name,
     email: catalog.sessionUser.email,
     role: catalog.sessionUser.role,
-    site: "Head Office",
+    site: catalog.defaultBusinessName,
     status: "Active",
     locked: true,
   };
@@ -65,7 +65,7 @@ export function updateHubUser(id, body) {
   row.name = String(body.name || row.name).trim();
   row.role = matchedRole?.name || nextRole;
   row.roleSlug = matchedRole?.slug || row.roleSlug;
-  row.site = String(body.site || row.site || "Head Office").trim();
+  row.site = String(body.site || row.site || catalog.defaultBusinessName).trim();
   if (body.status) row.status = body.status;
   refreshRoleUserCounts();
   return publicInvite(row);
@@ -112,7 +112,7 @@ export async function inviteUser({ name, email, role, site }) {
   const fullName = String(name || "").trim();
   const workEmail = String(email || "").trim().toLowerCase();
   const roleName = String(role || "").trim();
-  const homeSite = String(site || "Head Office").trim();
+  const homeSite = String(site || catalog.defaultBusinessName).trim();
 
   if (!fullName || !workEmail || !roleName) {
     const err = new Error("Name, work email and role are required.");

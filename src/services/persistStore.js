@@ -20,6 +20,15 @@ export const TABLE_CATALOG_KEYS = {
   purchase_requests: "purchaseRequests",
   machine_costs: "machineCosts",
   app_settings: "appSettings",
+  businesses: "businesses",
+  assets: "assets",
+  drivers: "drivers",
+  asset_logs: "assetLogs",
+  portfolio_documents: "portfolioDocuments",
+  notifications: "notifications",
+  activity_log: "activity",
+  business_transactions: "businessTransactions",
+  business_monthly_trend: "businessMonthlyTrend",
 };
 
 function tablePath(table) {

@@ -25,6 +25,10 @@ function applyLocal(table, rows, fallbackList) {
   return rows;
 }
 
+const ORDER_COLUMN = {
+  app_settings: "updated_at",
+};
+
 export async function readTable(table, fallback) {
   const local = localRows(table, fallback);
 
@@ -32,16 +36,24 @@ export async function readTable(table, fallback) {
     return local.length ? local : fallback;
   }
 
-  const { data, error } = await supabase.from(table).select("*").order("created_at", { ascending: false });
+  const orderBy = ORDER_COLUMN[table] || "created_at";
+  let query = supabase.from(table).select("*");
+  query = query.order(orderBy, { ascending: false, nullsFirst: false });
+  const { data, error } = await query;
   if (error) {
-    console.warn(`[supabase] read ${table}: ${error.message} — using local storage`);
-    return local.length ? local : fallback;
+    console.warn(`[supabase] read ${table}: ${error.message} — treating register as empty`);
+    if (Array.isArray(fallback)) {
+      applyLocal(table, [], fallback);
+      return [];
+    }
+    return fallback;
   }
 
   const dbRows = data ?? [];
-  if (dbRows.length) return dbRows;
-
-  return local.length ? local : fallback;
+  if (Array.isArray(fallback)) {
+    applyLocal(table, dbRows, fallback);
+  }
+  return dbRows;
 }
 
 export async function insertRow(table, payload, fallbackList) {

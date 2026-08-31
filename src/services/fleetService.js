@@ -1,4 +1,5 @@
 import * as catalog from "../data/catalog.js";
+import { recordSystemEvent } from "./notifications.js";
 import { deleteRow, insertRow, readTable, updateRow } from "./store.js";
 
 const SITES = ["Grootegeluk", "Belfast", "Medupi", "Head Office"];
@@ -81,7 +82,7 @@ export async function getFleet() {
   };
 }
 
-export async function addUnit(body) {
+export async function addUnit(body, actor = null) {
   const payload = persistPayload(body);
   const existing = (await readUnits()).find((row) => row.fleetNo === payload.fleet_no);
   if (existing) {
@@ -92,10 +93,18 @@ export async function addUnit(body) {
   const saved = await insertRow("equipment", payload, catalog.equipment);
   const row = toUnit({ ...payload, fleetNo: payload.fleet_no, ...saved });
   if (!saved.fleetNo) Object.assign(saved, row);
+  await recordSystemEvent({
+    title: "Fleet unit added",
+    detail: `${row.fleetNo} · ${row.equipment}`,
+    kind: "maintenance",
+    actor,
+    action: "added a fleet unit",
+    ctaPath: "/fleet",
+  });
   return row;
 }
 
-export async function updateUnit(id, body) {
+export async function updateUnit(id, body, actor = null) {
   const previous = (await readUnits()).find((row) => row.id === id);
   if (!previous) {
     const err = new Error("Unit not found");
@@ -112,10 +121,29 @@ export async function updateUnit(id, body) {
   const saved = await updateRow("equipment", id, payload, catalog.equipment);
   const row = toUnit({ ...previous, ...payload, fleetNo: payload.fleet_no, ...saved, id });
   Object.assign(saved, row);
+  await recordSystemEvent({
+    title: "Fleet unit updated",
+    detail: `${row.fleetNo} · ${row.equipment}`,
+    kind: "maintenance",
+    actor,
+    action: "updated a fleet unit",
+    ctaPath: "/fleet",
+  });
   return row;
 }
 
-export async function removeUnit(id) {
+export async function removeUnit(id, actor = null) {
+  const previous = (await readUnits()).find((row) => row.id === id);
   await deleteRow("equipment", id, catalog.equipment);
+  if (previous) {
+    await recordSystemEvent({
+      title: "Fleet unit removed",
+      detail: `${previous.fleetNo} · ${previous.equipment}`,
+      kind: "maintenance",
+      actor,
+      action: "removed a fleet unit",
+      ctaPath: "/fleet",
+    });
+  }
   return { ok: true };
 }

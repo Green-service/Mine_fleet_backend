@@ -91,6 +91,8 @@ export async function getHrData({ roles, invites, users }) {
     claims,
     invites,
     users,
+    businesses: catalog.businessNames,
+    defaultBusiness: catalog.defaultBusinessName,
     summary: buildSummary(employees, leave, claims, roles),
   };
 }

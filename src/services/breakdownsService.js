@@ -1,4 +1,5 @@
 import * as catalog from "../data/catalog.js";
+import { recordSystemEvent } from "./notifications.js";
 import { deleteRow, insertRow, readTable, updateRow } from "./store.js";
 
 const SEVERITY_RANK = { Critical: 0, Major: 1, Moderate: 2, Minor: 3 };
@@ -78,15 +79,23 @@ export async function getBreakdowns() {
   };
 }
 
-export async function reportBreakdown(body) {
+export async function reportBreakdown(body, actor = null) {
   const payload = persistItem(body);
   const saved = await insertRow("breakdowns", payload, catalog.breakdowns);
   const row = toItem({ ...payload, ...saved });
   if (!saved.machine) Object.assign(saved, row);
+  await recordSystemEvent({
+    title: "Breakdown reported",
+    detail: `${row.machine} · ${row.failure}`,
+    kind: "maintenance",
+    actor,
+    action: "reported a breakdown",
+    ctaPath: "/breakdowns",
+  });
   return row;
 }
 
-export async function updateBreakdown(id, body) {
+export async function updateBreakdown(id, body, actor = null) {
   const previous = (await readItems()).find((row) => row.id === id);
   if (!previous) {
     const err = new Error("Breakdown not found");
@@ -97,10 +106,29 @@ export async function updateBreakdown(id, body) {
   const saved = await updateRow("breakdowns", id, payload, catalog.breakdowns);
   const row = toItem({ ...previous, ...payload, ...saved, id });
   Object.assign(saved, row);
+  await recordSystemEvent({
+    title: "Breakdown updated",
+    detail: `${row.machine} · ${row.status}`,
+    kind: "maintenance",
+    actor,
+    action: "updated a breakdown",
+    ctaPath: "/breakdowns",
+  });
   return row;
 }
 
-export async function removeBreakdown(id) {
+export async function removeBreakdown(id, actor = null) {
+  const previous = (await readItems()).find((row) => row.id === id);
   await deleteRow("breakdowns", id, catalog.breakdowns);
+  if (previous) {
+    await recordSystemEvent({
+      title: "Breakdown removed",
+      detail: `${previous.machine} · ${previous.failure}`,
+      kind: "maintenance",
+      actor,
+      action: "removed a breakdown",
+      ctaPath: "/breakdowns",
+    });
+  }
   return { ok: true };
 }

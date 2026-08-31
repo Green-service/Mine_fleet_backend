@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "node --watch src/index.js",
-    "start": "node src/index.js"
+    "start": "node src/index.js",
+    "clear-portfolio": "node scripts/clear-portfolio.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.57.4",

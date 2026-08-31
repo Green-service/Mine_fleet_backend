@@ -1,7 +1,8 @@
 import * as catalog from "../data/catalog.js";
+import { recordSystemEvent } from "./notifications.js";
 import { deleteRow, insertRow, readTable, updateRow } from "./store.js";
 
-const COST_PER_LITRE = 31.65;
+const FUEL_TYPES = ["Petrol 95", "Petrol 93", "Diesel 50"];
 
 function num(value) {
   const n = Number(String(value ?? "").replace(/[^\d.-]/g, ""));
@@ -22,9 +23,7 @@ function parseDate(value) {
 
 function formatDmy(value) {
   const date = parseDate(value) || new Date();
-  const dd = String(date.getDate()).padStart(2, "0");
-  const mm = String(date.getMonth() + 1).padStart(2, "0");
-  return `${dd}/${mm}/${date.getFullYear()}`;
+  return date.toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" });
 }
 
 function formatIso(value) {
@@ -34,175 +33,199 @@ function formatIso(value) {
   return `${date.getFullYear()}-${mm}-${dd}`;
 }
 
-function formatTime(value) {
-  if (value) return String(value);
-  return new Date().toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" });
-}
+function toFill(row, assetMap = {}, driverMap = {}) {
+  const assetId = row.asset_id || row.assetId;
+  const asset = assetMap[assetId];
+  const workDate = row.work_date || row.workDate || row.date;
+  const litres = num(row.litres);
+  const odometerKm = num(row.odometer_km ?? row.odometerKm);
+  const driver = row.operator || row.driver || driverMap[asset?.assigned_driver_id]?.name || "";
 
-function sameDay(value, asOf) {
-  const date = parseDate(value);
-  return Boolean(date && date.getFullYear() === asOf.getFullYear() && date.getMonth() === asOf.getMonth() && date.getDate() === asOf.getDate());
-}
-
-function sameMonth(value, asOf) {
-  const date = parseDate(value);
-  return Boolean(date && date.getFullYear() === asOf.getFullYear() && date.getMonth() === asOf.getMonth());
-}
-
-function statusFromRate(litres, hours) {
-  if (!hours) return "Investigate";
-  const rate = litres / hours;
-  if (rate < 16) return "Efficient";
-  if (rate < 20) return "Normal";
-  if (rate < 24) return "High Usage";
-  return "Investigate";
-}
-
-function toIssue(row) {
-  const workDate = row.work_date || row.workDate || row.date || row.issued_at;
   return {
     id: row.id,
-    date: formatDmy(workDate),
+    assetId,
+    assetCode: asset?.asset_code || asset?.assetCode || "—",
+    makeModel: asset?.make_model || asset?.makeModel || "",
+    vehicleLabel: asset ? `${asset.asset_code || asset.assetCode} · ${asset.make_model || asset.makeModel}` : "—",
+    business: row.business || asset?.business || "Bolt rides",
     workDate: formatIso(workDate),
-    time: row.issue_time || row.time || "",
-    site: row.site || "Grootegeluk",
-    machine: String(row.machine || "").trim().toUpperCase(),
-    operator: row.operator || "",
-    opening: num(row.opening),
-    closing: num(row.closing),
-    litres: num(row.litres),
-    approvedBy: row.approved_by || row.approvedBy || "Pending",
+    date: formatDmy(workDate),
+    station: row.station || row.site || "—",
+    fuelType: row.fuel_type || row.fuelType || "Petrol 95",
+    litres,
+    litresLabel: `${litres.toLocaleString("en-ZA")} L`,
+    odometerKm,
+    odometerLabel: odometerKm ? `${odometerKm.toLocaleString("en-ZA")} km` : "—",
+    driver,
+    notes: row.notes || "",
   };
 }
 
-function issueHours(row) {
-  return row.closing > row.opening ? row.closing - row.opening : 0;
+function fillEfficiency(fills) {
+  const sorted = [...fills].sort((a, b) => String(a.workDate).localeCompare(String(b.workDate)));
+  if (sorted.length < 2) return null;
+  const latest = sorted[sorted.length - 1];
+  const previous = sorted[sorted.length - 2];
+  const km = num(latest.odometerKm) - num(previous.odometerKm);
+  if (km <= 0) return null;
+  return Number(((latest.litres / km) * 100).toFixed(1));
 }
 
-function rollupMachines(issues) {
-  const groups = new Map();
-  for (const issue of issues) {
-    const key = issue.machine || "UNKNOWN";
-    const current = groups.get(key) || {
-      id: `mach-${key}`,
-      machine: key,
-      site: issue.site,
-      litres: 0,
-      hours: 0,
-      costPerLitre: COST_PER_LITRE,
-    };
-    current.litres += issue.litres;
-    current.hours += issueHours(issue);
-    current.site = issue.site || current.site;
-    groups.set(key, current);
+function enrichFillsWithEfficiency(fills) {
+  const byAsset = new Map();
+  for (const fill of fills) {
+    const list = byAsset.get(fill.assetId) || [];
+    list.push(fill);
+    byAsset.set(fill.assetId, list);
   }
-  return [...groups.values()]
-    .map((row) => ({ ...row, status: statusFromRate(row.litres, row.hours) }))
-    .sort((a, b) => b.litres - a.litres);
+  return fills.map((fill) => {
+    const assetFills = byAsset.get(fill.assetId) || [];
+    const sorted = [...assetFills].sort((a, b) => String(a.workDate).localeCompare(String(b.workDate)));
+    const index = sorted.findIndex((row) => row.id === fill.id);
+    const segment = index > 0 ? fillEfficiency([sorted[index - 1], sorted[index]]) : null;
+    return {
+      ...fill,
+      l100kmLabel: segment != null ? `${segment} L/100km` : "—",
+    };
+  });
 }
 
-function buildAlerts(machines) {
-  return machines
-    .filter((row) => row.status === "Investigate" || row.status === "High Usage")
-    .map((row, index) => ({
-      id: `alert-${row.machine}-${index}`,
-      tone: row.status === "Investigate" ? "Critical" : "Watch",
-      text:
-        row.hours > 0
-          ? `${row.machine} · ${(row.litres / row.hours).toFixed(1)} L/hr — ${row.status.toLowerCase()}`
-          : `${row.machine} · missing hour meter on the last issue`,
-    }));
-}
-
-function buildKpis(issues, machines, asOf = new Date()) {
-  const todayIssues = issues.filter((row) => sameDay(row.workDate || row.date, asOf));
-  const monthIssues = issues.filter((row) => sameMonth(row.workDate || row.date, asOf));
-  const issuedToday = todayIssues.reduce((sum, row) => sum + row.litres, 0);
-  const monthLitres = monthIssues.reduce((sum, row) => sum + row.litres, 0);
-  const totalLitres = machines.reduce((sum, row) => sum + row.litres, 0);
-  const totalHours = machines.reduce((sum, row) => sum + row.hours, 0);
-  const exceptions = machines.filter((row) => row.status === "Investigate" || row.status === "High Usage").length;
-  return {
-    issuedToday,
-    costPerLitre: COST_PER_LITRE,
-    exceptions,
-    litresPerHour: totalHours ? Number((totalLitres / totalHours).toFixed(1)) : 0,
-    fuelPerTonne: 0,
-    monthlySpend: monthLitres * COST_PER_LITRE,
-    mtdReceived: 0,
-    mtdIssued: monthLitres,
-    closingStock: 0,
-    largestLoss: 0,
-  };
-}
-
-function persistIssue(input, previous = {}) {
-  const machine = String(input.machine || previous.machine || "").trim().toUpperCase();
-  if (!machine) {
-    const err = new Error("Fleet number is required.");
+function persistFill(input, previous = {}, assetRow = null) {
+  const assetId = String(input.assetId || input.asset_id || previous.assetId || "").trim();
+  if (!assetId) {
+    const err = new Error("Select a vehicle for this fill.");
     err.status = 400;
     throw err;
   }
   const litres = num(input.litres ?? previous.litres);
-  if (litres < 0) {
-    const err = new Error("Litres must be zero or more.");
+  if (litres <= 0) {
+    const err = new Error("Enter litres filled.");
     err.status = 400;
     throw err;
   }
+  const odometerKm = num(input.odometerKm ?? input.odometer_km ?? previous.odometerKm);
+  if (odometerKm <= 0) {
+    const err = new Error("Enter the odometer reading (km).");
+    err.status = 400;
+    throw err;
+  }
+
   return {
-    work_date: formatIso(input.date || input.work_date || previous.workDate || previous.date || new Date()),
-    issue_time: formatTime(input.time || previous.time),
-    site: String(input.site || previous.site || "Grootegeluk").trim(),
-    machine,
-    operator: String(input.operator || previous.operator || "").trim(),
-    opening: num(input.opening ?? previous.opening),
-    closing: num(input.closing ?? previous.closing),
+    asset_id: assetId,
+    business: assetRow?.business || input.business || previous.business || "Bolt rides",
+    work_date: formatIso(input.date || input.work_date || input.workDate || previous.workDate || new Date()),
+    fuel_type: FUEL_TYPES.includes(input.fuelType || input.fuel_type) ? (input.fuelType || input.fuel_type) : (previous.fuelType || "Petrol 95"),
     litres,
-    approved_by: input.approvedBy || previous.approvedBy || "Pending",
+    odometer_km: odometerKm,
   };
 }
 
-async function readIssues() {
+async function readAssets() {
+  return readTable("assets", catalog.assets);
+}
+
+async function readDrivers() {
+  return readTable("drivers", catalog.drivers);
+}
+
+async function readFillsRaw() {
   const rows = await readTable("diesel_issues", catalog.dieselIssues);
-  return rows.map(toIssue);
+  const vehicleRows = rows.filter((row) => row.asset_id || row.assetId);
+  return vehicleRows.length ? vehicleRows : catalog.dieselIssues;
 }
 
 export async function getDiesel() {
-  const issues = await readIssues();
-  const byMachine = rollupMachines(issues);
-  const alerts = buildAlerts(byMachine);
+  const [assets, drivers, rawFills] = await Promise.all([
+    readAssets(),
+    readDrivers(),
+    readFillsRaw(),
+  ]);
+  const assetMap = Object.fromEntries(assets.map((row) => [row.id, row]));
+  const driverMap = Object.fromEntries(drivers.map((row) => [row.id, row]));
+  const fills = enrichFillsWithEfficiency(
+    rawFills
+      .map((row) => toFill(row, assetMap, driverMap))
+      .filter((row) => row.assetId)
+      .sort((a, b) => String(b.workDate).localeCompare(String(a.workDate))),
+  );
+  const assetOptions = assets
+    .filter((row) => (row.kind || "vehicle") !== "property")
+    .map((row) => ({
+    id: row.id,
+    label: `${row.asset_code || row.assetCode} · ${row.make_model || row.makeModel}`,
+    business: row.business,
+    fuelType: String(row.make_model || row.makeModel).toLowerCase().includes("ranger") ? "Diesel 50" : "Petrol 95",
+  }));
+
   return {
-    kpis: buildKpis(issues, byMachine),
-    byMachine,
-    issues,
-    alerts,
-    recon: [],
+    fills,
+    assets: assetOptions,
+    fuelTypes: FUEL_TYPES,
   };
 }
 
-export async function captureIssue(body) {
-  const payload = persistIssue(body);
-  const saved = await insertRow("diesel_issues", payload, catalog.dieselIssues);
-  const row = toIssue({ ...payload, date: payload.work_date, time: payload.issue_time, approvedBy: payload.approved_by, ...saved });
-  if (!saved.date) Object.assign(saved, row);
-  return row;
-}
-
-export async function updateIssue(id, body) {
-  const previous = (await readIssues()).find((row) => row.id === id);
-  if (!previous) {
-    const err = new Error("Issue not found");
+export async function captureIssue(body, actor = null) {
+  const assets = await readAssets();
+  const assetRow = assets.find((row) => row.id === (body.assetId || body.asset_id));
+  if (!assetRow) {
+    const err = new Error("Vehicle not found");
     err.status = 404;
     throw err;
   }
-  const payload = persistIssue(body, previous);
-  const saved = await updateRow("diesel_issues", id, payload, catalog.dieselIssues);
-  const row = toIssue({ ...previous, ...payload, date: payload.work_date, time: payload.issue_time, approvedBy: payload.approved_by, ...saved, id });
-  Object.assign(saved, row);
-  return row;
+  const payload = persistFill(body, {}, assetRow);
+  const saved = await insertRow("diesel_issues", payload, catalog.dieselIssues);
+  const assetMap = Object.fromEntries(assets.map((row) => [row.id, row]));
+  const fill = toFill({ ...payload, ...saved }, assetMap);
+  await recordSystemEvent({
+    title: "Fuel fill logged",
+    detail: `${fill.assetLabel || fill.machine} · ${fill.litres} L`,
+    kind: "maintenance",
+    actor,
+    action: "logged a fuel fill",
+    ctaPath: "/diesel",
+  });
+  return fill;
 }
 
-export async function removeIssue(id) {
+export async function updateIssue(id, body, actor = null) {
+  const [rawFills, assets, drivers] = await Promise.all([readFillsRaw(), readAssets(), readDrivers()]);
+  const previousRaw = rawFills.find((row) => row.id === id);
+  if (!previousRaw) {
+    const err = new Error("Fuel entry not found");
+    err.status = 404;
+    throw err;
+  }
+  const assetMap = Object.fromEntries(assets.map((row) => [row.id, row]));
+  const driverMap = Object.fromEntries(drivers.map((row) => [row.id, row]));
+  const previous = toFill(previousRaw, assetMap, driverMap);
+  const assetRow = assets.find((row) => row.id === (body.assetId || body.asset_id || previous.assetId));
+  const payload = persistFill(body, previous, assetRow);
+  const saved = await updateRow("diesel_issues", id, payload, catalog.dieselIssues);
+  const fill = toFill({ ...previousRaw, ...payload, ...saved, id }, assetMap, driverMap);
+  await recordSystemEvent({
+    title: "Fuel fill updated",
+    detail: `${fill.assetLabel || fill.machine} · ${fill.litres} L`,
+    kind: "maintenance",
+    actor,
+    action: "updated a fuel fill",
+    ctaPath: "/diesel",
+  });
+  return fill;
+}
+
+export async function removeIssue(id, actor = null) {
+  const rawFills = await readFillsRaw();
+  const previous = rawFills.find((row) => row.id === id);
   await deleteRow("diesel_issues", id, catalog.dieselIssues);
+  if (previous) {
+    await recordSystemEvent({
+      title: "Fuel fill removed",
+      detail: previous.machine || previous.station || "Fuel entry",
+      kind: "maintenance",
+      actor,
+      action: "removed a fuel fill",
+      ctaPath: "/diesel",
+    });
+  }
   return { ok: true };
 }

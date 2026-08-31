@@ -1,4 +1,5 @@
 import * as catalog from "../data/catalog.js";
+import { recordSystemEvent } from "./notifications.js";
 import { insertRow, readTable } from "./store.js";
 
 function num(value) {
@@ -97,7 +98,7 @@ export async function getProcurement() {
   };
 }
 
-export async function createRequest(body) {
+export async function createRequest(body, actor = null) {
   const item = String(body.item || "").trim();
   if (!item) {
     const err = new Error("Item description is required.");
@@ -116,5 +117,13 @@ export async function createRequest(body) {
   const saved = await insertRow("purchase_requests", payload, catalog.purchaseRequests);
   const row = toRequest({ ...payload, ...saved });
   Object.assign(saved, row);
+  await recordSystemEvent({
+    title: "Purchase request raised",
+    detail: `${row.requestNo} · ${item}`,
+    kind: "finance",
+    actor,
+    action: "raised a purchase request",
+    ctaPath: "/procurement",
+  });
   return row;
 }

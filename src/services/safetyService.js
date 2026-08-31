@@ -1,4 +1,5 @@
 import * as catalog from "../data/catalog.js";
+import { recordSystemEvent } from "./notifications.js";
 import { deleteRow, insertRow, readTable, updateRow } from "./store.js";
 
 function toAction(row) {
@@ -75,15 +76,23 @@ export async function getSafety() {
   return { actions, kpis: buildKpis(actions) };
 }
 
-export async function reportSafety(body) {
+export async function reportSafety(body, actor = null) {
   const payload = persistAction(body);
   const saved = await insertRow("safety_actions", payload, catalog.safetyActions);
   const row = toAction({ ...payload, ...saved });
   Object.assign(saved, row);
+  await recordSystemEvent({
+    title: "SHEQ action logged",
+    detail: `${row.source} · ${row.action}`,
+    kind: "maintenance",
+    actor,
+    action: "logged a SHEQ action",
+    ctaPath: "/safety",
+  });
   return row;
 }
 
-export async function updateSafety(id, body) {
+export async function updateSafety(id, body, actor = null) {
   const previous = (await readActions()).find((row) => row.id === id);
   if (!previous) {
     const err = new Error("Action not found");
@@ -94,10 +103,29 @@ export async function updateSafety(id, body) {
   const saved = await updateRow("safety_actions", id, payload, catalog.safetyActions);
   const row = toAction({ ...previous, ...payload, ...saved, id });
   Object.assign(saved, row);
+  await recordSystemEvent({
+    title: "SHEQ action updated",
+    detail: row.action,
+    kind: "maintenance",
+    actor,
+    action: "updated a SHEQ action",
+    ctaPath: "/safety",
+  });
   return row;
 }
 
-export async function removeSafety(id) {
+export async function removeSafety(id, actor = null) {
+  const previous = (await readActions()).find((row) => row.id === id);
   await deleteRow("safety_actions", id, catalog.safetyActions);
+  if (previous) {
+    await recordSystemEvent({
+      title: "SHEQ action removed",
+      detail: previous.action,
+      kind: "maintenance",
+      actor,
+      action: "removed a SHEQ action",
+      ctaPath: "/safety",
+    });
+  }
   return { ok: true };
 }

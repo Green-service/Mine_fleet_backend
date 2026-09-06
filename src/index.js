@@ -14,12 +14,20 @@ syncBusinessCatalog(await readBusinessRows());
 
 const app = express();
 const corsOrigins = new Set(
-  [env.clientOrigin, "https://localhost", "capacitor://localhost", "http://localhost"].filter(Boolean),
+  [
+    ...String(env.clientOrigin || "").split(",").map((origin) => origin.trim()).filter(Boolean),
+    "https://localhost",
+    "capacitor://localhost",
+    "http://localhost",
+  ].filter(Boolean),
 );
+const ALWAYS_ALLOWED_ORIGIN = /^https?:\/\/localhost(:\d+)?$|^https?:\/\/127\.0\.0\.1(:\d+)?$|^https:\/\/([a-z0-9-]+--)?[a-z0-9-]+\.netlify\.app$/i;
 app.use(
   cors({
     origin(origin, callback) {
-      if (!origin || corsOrigins.has(origin)) return callback(null, true);
+      if (!origin || corsOrigins.has(origin) || ALWAYS_ALLOWED_ORIGIN.test(origin)) {
+        return callback(null, true);
+      }
       return callback(new Error(`CORS blocked: ${origin}`));
     },
     credentials: true,

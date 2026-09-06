@@ -1,248 +1,184 @@
-import * as catalog from "../data/catalog.js";
-import { readTable } from "./store.js";
-import { mapBusiness, readBusinessRows } from "./businessesService.js";
-import {
-  buildLogTransactions,
-  buildTrendFromLogs,
-  summarizeBusinessLogs,
-} from "./assetFinance.js";
+import { getFleet } from "./fleetService.js";
+import { getDiesel } from "./dieselService.js";
+import { getBoard } from "./productionService.js";
+import { getSafety } from "./safetyService.js";
+import { getMaintenance } from "./maintenanceService.js";
+import { getProcurement } from "./procurementService.js";
+import { getFinance } from "./financeService.js";
+import { getBreakdowns } from "./breakdownsService.js";
 
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+const SITES = ["Grootegeluk", "Belfast", "Medupi", "Head Office"];
 
 function num(value) {
   const n = Number(value ?? 0);
   return Number.isFinite(n) ? n : 0;
 }
 
+function monthKey(dateStr) {
+  const d = new Date(dateStr);
+  if (Number.isNaN(d.getTime())) return null;
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+}
+
 function monthLabel(key) {
-  const match = String(key).match(/^(\d{4})-(\d{2})$/);
-  if (!match) return key;
-  return MONTHS[Number(match[2]) - 1] || key;
+  const month = Number(key.split("-")[1]);
+  return MONTHS[month - 1] || key;
 }
 
-function compactMoney(value) {
-  const n = num(value);
-  if (!n) return "R 0";
-  if (Math.abs(n) >= 1_000_000) return `R ${(n / 1_000_000).toFixed(2)}m`;
-  if (Math.abs(n) >= 1_000) return `R ${Math.round(n / 1000)}k`;
-  return `R ${n.toLocaleString("en-ZA", { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
+function buildTrend(rows, dateKey, valueFn) {
+  const totals = new Map();
+  for (const row of rows) {
+    const key = monthKey(row[dateKey]);
+    if (!key) continue;
+    totals.set(key, (totals.get(key) || 0) + valueFn(row));
+  }
+  return [...totals.entries()]
+    .sort(([a], [b]) => a.localeCompare(b))
+    .slice(-6)
+    .map(([key, value]) => ({ month: monthLabel(key), value: Number(value.toFixed(1)) }));
 }
 
-function money(value) {
-  const n = num(value);
-  return `R ${n.toLocaleString("en-ZA", { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
-}
-
-function marginPct(revenue, expenses) {
-  if (!revenue) return 0;
-  return Number((((revenue - expenses) / revenue) * 100).toFixed(1));
-}
-
-function toneForMargin(value) {
-  if (value >= 25) return "good";
-  if (value >= 10) return "warn";
-  if (value > 0) return "warn";
+function toneFor(value, good, warn) {
+  if (value >= good) return "good";
+  if (value >= warn) return "warn";
   return "bad";
 }
 
-function toneForProfit(value) {
-  if (value > 0) return "good";
-  if (value === 0) return "warn";
-  return "bad";
-}
-
-async function readBusinesses() {
-  return readBusinessRows();
-}
-
-async function readTransactions() {
-  return readTable("business_transactions", catalog.businessTransactions);
-}
-
-async function readMonthlyTrend() {
-  return readTable("business_monthly_trend", catalog.businessMonthlyTrend);
-}
-
-function buildKpis(businesses) {
-  const revenue = businesses.reduce((sum, row) => sum + row.revenueMtd, 0);
-  const expenses = businesses.reduce((sum, row) => sum + row.expensesMtd, 0);
-  const net = revenue - expenses;
-  const cash = businesses.reduce((sum, row) => sum + row.cashBalance, 0);
-  const active = businesses.filter((row) => row.status === "Active").length;
-  const portfolioMargin = marginPct(revenue, expenses);
-
-  return [
-    {
-      key: "revenue",
-      label: "Portfolio revenue",
-      value: compactMoney(revenue),
-      hint: "Logged income across all ventures",
-      tone: revenue ? "good" : "warn",
-    },
-    {
-      key: "expenses",
-      label: "Portfolio expenses",
-      value: compactMoney(expenses),
-      hint: "Operating costs MTD",
-      tone: "warn",
-    },
-    {
-      key: "net",
-      label: "Net profit",
-      value: compactMoney(net),
-      hint: "After logged expenses and deductions",
-      tone: toneForProfit(net),
-    },
-    {
-      key: "cash",
-      label: "Cash on hand",
-      value: compactMoney(cash),
-      hint: "Balances across business accounts",
-      tone: cash >= 100000 ? "good" : "blue",
-    },
-    {
-      key: "active",
-      label: "Active businesses",
-      value: String(active),
-      hint: `${businesses.length} in portfolio`,
-      tone: "navy",
-    },
-    {
-      key: "businessesNet",
-      label: "Total businesses net",
-      value: compactMoney(businesses.reduce((sum, row) => sum + row.netMtd, 0)),
-      hint: `Combined net MTD across ${businesses.length} ventures`,
-      tone: toneForProfit(businesses.reduce((sum, row) => sum + row.netMtd, 0)),
-    },
-  ];
-}
-
-function buildOverviewTrend(logRows, monthlyRows) {
-  const fromLogs = buildTrendFromLogs(logRows);
-  const hasLogTrend = fromLogs.revenueTrend.some((row) => row.value > 0)
-    || fromLogs.expensesTrend.some((row) => row.value > 0);
-  if (hasLogTrend) return fromLogs;
-  return buildTrend(monthlyRows);
-}
-
-function buildTrend(monthlyRows) {
-  const rows = monthlyRows.length ? monthlyRows : [];
-  const revenueTrend = rows.map((row) => ({
-    month: monthLabel(row.month_key ?? row.monthKey),
-    value: Number((num(row.revenue) / 1000).toFixed(1)),
-  }));
-  const expensesTrend = rows.map((row) => ({
-    month: monthLabel(row.month_key ?? row.monthKey),
-    value: Number((num(row.expenses) / 1000).toFixed(1)),
-  }));
-  const netTrend = rows.map((row) => ({
-    month: monthLabel(row.month_key ?? row.monthKey),
-    value: Number(((num(row.revenue) - num(row.expenses)) / 1000).toFixed(1)),
-  }));
-  return { revenueTrend, expensesTrend, netTrend };
-}
-
-function applyLogTotals(business, totalsByBusiness) {
-  const totals = totalsByBusiness.get(business.name);
-  if (!totals) {
-    return {
-      ...business,
-      logSynced: false,
-    };
-  }
-  const income = totals.income;
-  const expenses = totals.expenses;
-  const net = income - expenses;
-  const margin = marginPct(income, expenses);
-  return {
-    ...business,
-    revenueMtd: income,
-    expensesMtd: expenses,
-    netMtd: net,
-    marginPct: margin,
-    revenueLabel: money(income),
-    expensesLabel: money(expenses),
-    netLabel: money(net),
-    marginLabel: `${margin.toFixed(1)}%`,
-    loggedIncome: income,
-    loggedExpenses: expenses,
-    netLogged: net,
-    logSynced: true,
-  };
-}
-
-function buildTransactions(transactions, businesses, logTransactions = []) {
-  const byId = Object.fromEntries(businesses.map((row) => [row.id, row.name]));
-  const manual = transactions
-    .map((row) => ({
-      id: row.id,
-      date: row.date,
-      dateIso: row.date,
-      business: byId[row.business_id ?? row.businessId] || "—",
-      label: row.label,
-      type: row.type,
-      category: row.category,
-      amount: num(row.amount),
-      amountLabel: money(Math.abs(num(row.amount))),
-      tone: num(row.amount) >= 0 ? "good" : "bad",
-      source: "manual",
-    }));
-
-  return [...logTransactions, ...manual]
-    .sort((a, b) => String(b.dateIso || b.date).localeCompare(String(a.dateIso || a.date)));
-}
-
-function buildAlerts(businesses) {
-  const alerts = [];
-  for (const row of businesses) {
-    if (row.status === "Setup") {
-      alerts.push({
-        id: `alert-setup-${row.id}`,
-        tone: "due",
-        title: `${row.name} still in setup`,
-        detail: row.note || "No revenue captured yet for this venture.",
-      });
-    }
-    if (row.revenueMtd > 0 && row.marginPct < 15) {
-      alerts.push({
-        id: `alert-margin-${row.id}`,
-        tone: "critical",
-        title: `${row.name} margin below 15%`,
-        detail: `${row.marginLabel} after ${row.expensesLabel} expenses MTD.`,
-      });
-    }
-  }
-  return alerts.slice(0, 6);
+function isDown(status) {
+  return ["Breakdown", "Maintenance", "Standby"].includes(status);
 }
 
 export async function getOverview() {
-  const [businessRows, transactionRows, monthlyRows, logRows] = await Promise.all([
-    readBusinesses(),
-    readTransactions(),
-    readMonthlyTrend(),
-    readTable("asset_logs", catalog.assetLogs),
+  const [fleet, diesel, board, safety, maintenance, procurement, finance, breakdowns] = await Promise.all([
+    getFleet(),
+    getDiesel(),
+    getBoard(),
+    getSafety(),
+    getMaintenance(),
+    getProcurement(),
+    getFinance(),
+    getBreakdowns(),
   ]);
 
-  const totalsByBusiness = summarizeBusinessLogs(logRows);
-  const logTransactions = buildLogTransactions(logRows);
+  const equipment = fleet.equipment;
+  const total = equipment.length;
+  const down = equipment.filter((row) => isDown(row.status));
+  const availability = total ? Number((((total - down.length) / total) * 100).toFixed(1)) : 0;
+  const avgHealth = total ? Number((equipment.reduce((sum, row) => sum + num(row.health), 0) / total).toFixed(1)) : 0;
 
-  const businesses = businessRows
-    .map((row) => applyLogTotals(mapBusiness(row), totalsByBusiness))
-    .sort((a, b) => {
-      if (a.primary !== b.primary) return a.primary ? -1 : 1;
-      return b.netMtd - a.netMtd;
-    });
+  const overduePlan = maintenance.servicePlan.filter((row) => row.status === "Overdue").length;
+  const pmCompliance = maintenance.servicePlan.length
+    ? Number((((maintenance.servicePlan.length - overduePlan) / maintenance.servicePlan.length) * 100).toFixed(0))
+    : 100;
 
-  const { revenueTrend, expensesTrend, netTrend } = buildOverviewTrend(logRows, monthlyRows);
+  const openRequests = procurement.requests.filter((row) => row.status === "Awaiting Approval").length;
+
+  const kpis = [
+    {
+      key: "availability",
+      label: "Fleet availability",
+      value: `${availability}%`,
+      hint: total ? `${down.length} unit${down.length === 1 ? "" : "s"} off the board` : "No units on the register yet",
+      tone: total ? toneFor(availability, 90, 80) : "warn",
+    },
+    {
+      key: "utilisation",
+      label: "Fleet utilisation",
+      value: `${avgHealth}%`,
+      hint: "Average condition score across the fleet",
+      tone: total ? toneFor(avgHealth, 80, 60) : "warn",
+    },
+    {
+      key: "down",
+      label: "Machines down",
+      value: String(down.length),
+      hint: down.length ? down.slice(0, 2).map((row) => row.fleetNo).join(" · ") : "All units accounted for",
+      tone: down.length ? "bad" : "good",
+    },
+    {
+      key: "production",
+      label: "Production today",
+      value: `${Math.round(board.summary.dailyActual).toLocaleString("en-ZA")} t`,
+      hint: board.summary.dailyTarget
+        ? `${Math.round((board.summary.dailyActual / board.summary.dailyTarget) * 100)}% of target`
+        : "No shifts captured today",
+      tone: board.summary.dailyTarget && board.summary.dailyActual >= board.summary.dailyTarget ? "good" : "warn",
+    },
+    {
+      key: "pm",
+      label: "PM compliance",
+      value: `${pmCompliance}%`,
+      hint: `${overduePlan} service${overduePlan === 1 ? "" : "s"} overdue`,
+      tone: toneFor(pmCompliance, 90, 75),
+    },
+    {
+      key: "safety",
+      label: "Open safety actions",
+      value: String(safety.kpis.openActions),
+      hint: safety.kpis.hints.openActions,
+      tone: safety.kpis.overdueActions ? "warn" : "good",
+    },
+    {
+      key: "spares",
+      label: "Critical spares risk",
+      value: String(openRequests),
+      hint: openRequests ? "Requests awaiting approval" : "No open requests",
+      tone: openRequests ? "bad" : "good",
+    },
+    {
+      key: "cost",
+      label: "Monthly operating cost",
+      value: finance.kpis.monthlyMachine,
+      hint: "Machine cost register, month to date",
+      tone: "warn",
+    },
+  ];
+
+  const availabilityTrend = total ? [{ month: MONTHS[new Date().getMonth()], value: availability }] : [];
+  const productionTrend = buildTrend(
+    board.daily.filter((row) => ["GG", "Medupi"].includes(row.site)),
+    "workDate",
+    (row) => num(row.actual) / 1000,
+  );
+  const dieselTrend = buildTrend(diesel.issues, "date", (row) => (num(row.litres) * num(diesel.kpis.costPerLitre)) / 1_000_000);
+
+  const alerts = [];
+  for (const item of breakdowns.items.filter((row) => row.severity === "Critical").slice(0, 2)) {
+    alerts.push({ id: `breakdown-${item.machine}`, tone: "critical", title: `${item.machine} ${item.failure}`, detail: `${item.status} · ${item.downtime} down · ${item.site}` });
+  }
+  for (const row of maintenance.servicePlan.filter((row) => row.status === "Overdue").slice(0, 2)) {
+    alerts.push({ id: `service-${row.fleetNo}`, tone: "due", title: `${row.fleetNo} service overdue`, detail: row.notes || "Book a workshop slot." });
+  }
+  for (const row of procurement.requests.filter((row) => row.status === "Awaiting Approval").slice(0, 1)) {
+    alerts.push({ id: `pr-${row.request}`, tone: "critical", title: `${row.item || "Purchase request"} awaiting approval`, detail: `${row.request} · ${row.machine || "—"}` });
+  }
+  if (safety.kpis.overdueActions) {
+    alerts.push({ id: "safety-overdue", tone: "safety", title: `${safety.kpis.overdueActions} corrective action${safety.kpis.overdueActions === 1 ? "" : "s"} overdue`, detail: "SHEQ register needs close-out." });
+  }
+
+  const sitePulse = SITES.map((site) => {
+    const units = equipment.filter((row) => row.site === site);
+    const siteDown = units.filter((row) => isDown(row.status));
+    const siteAvailability = units.length ? Number((((units.length - siteDown.length) / units.length) * 100).toFixed(0)) : 0;
+    const productionCard = site === "Grootegeluk" ? board.summary.gg : site === "Medupi" ? board.summary.medupi : null;
+    const productionPct = productionCard ? Math.round(productionCard.pct) : null;
+    const status = !units.length ? "No units" : siteAvailability >= 90 ? "Stable" : siteAvailability >= 75 ? "Monitor" : "Attention";
+    return {
+      site,
+      availability: siteAvailability,
+      production: productionPct ?? "—",
+      diesel: siteDown.length ? `${siteDown.length} down` : "On plan",
+      status,
+    };
+  }).filter((row) => row.status !== "No units");
 
   return {
-    kpis: buildKpis(businesses),
-    businesses,
-    logBasis: "asset_logs",
-    revenueTrend,
-    expensesTrend,
-    netTrend,
-    transactions: buildTransactions(transactionRows, businesses, logTransactions),
-    alerts: buildAlerts(businesses),
+    kpis,
+    availabilityTrend,
+    productionTrend,
+    dieselTrend,
+    alerts: alerts.slice(0, 6),
+    sitePulse,
   };
 }

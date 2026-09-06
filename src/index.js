@@ -5,27 +5,18 @@ import { router } from "./routes/index.js";
 import { errorHandler, notFound } from "./middleware/error.js";
 import * as catalog from "./data/catalog.js";
 import { hydrateCatalog } from "./services/persistStore.js";
-import { readBusinessRows, syncBusinessCatalog } from "./services/businessesService.js";
 
 if (!usingSupabase) {
   hydrateCatalog(catalog);
 }
-syncBusinessCatalog(await readBusinessRows());
+
+const ALWAYS_ALLOWED_ORIGIN = /^https?:\/\/localhost(:\d+)?$|^https?:\/\/127\.0\.0\.1(:\d+)?$|^https:\/\/([a-z0-9-]+--)?[a-z0-9-]+\.netlify\.app$/i;
 
 const app = express();
-const corsOrigins = new Set(
-  [
-    ...String(env.clientOrigin || "").split(",").map((origin) => origin.trim()).filter(Boolean),
-    "https://localhost",
-    "capacitor://localhost",
-    "http://localhost",
-  ].filter(Boolean),
-);
-const ALWAYS_ALLOWED_ORIGIN = /^https?:\/\/localhost(:\d+)?$|^https?:\/\/127\.0\.0\.1(:\d+)?$|^https:\/\/([a-z0-9-]+--)?[a-z0-9-]+\.netlify\.app$/i;
 app.use(
   cors({
     origin(origin, callback) {
-      if (!origin || corsOrigins.has(origin) || ALWAYS_ALLOWED_ORIGIN.test(origin)) {
+      if (!origin || env.clientOrigins.includes(origin) || ALWAYS_ALLOWED_ORIGIN.test(origin)) {
         return callback(null, true);
       }
       return callback(new Error(`CORS blocked: ${origin}`));

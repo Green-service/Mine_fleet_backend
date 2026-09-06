@@ -8,7 +8,13 @@ dotenv.config({ path: path.join(root, "server", ".env") });
 
 export const env = {
   port: Number(process.env.PORT || 5050),
-  clientOrigin: process.env.CLIENT_ORIGIN || "http://localhost:5173",
+  get clientOrigin() {
+    return this.clientOrigins[0];
+  },
+  clientOrigins: (process.env.CLIENT_ORIGIN || "http://localhost:5173")
+    .split(",")
+    .map((origin) => origin.trim())
+    .filter(Boolean),
   supabaseUrl: process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || "",
   supabaseKey:
     process.env.SUPABASE_SERVICE_ROLE_KEY ||

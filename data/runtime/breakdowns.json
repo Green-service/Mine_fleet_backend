@@ -1,0 +1,24 @@
+[
+  {
+    "id": "0d2a07c6-8982-4d7a-b629-04f9057b00d1",
+    "machine": "CMPG04",
+    "failure": "SFRD",
+    "downtime": "4",
+    "severity": "Critical",
+    "parts": "4UDGB",
+    "status": "Investigation",
+    "site": "Grootegeluk",
+    "created_at": "2026-09-07T16:32:47.747205+00:00"
+  },
+  {
+    "id": "1c851b4f-77d8-4851-9f40-77cf9e2d5c91",
+    "machine": "345678",
+    "failure": "drggcscgevg",
+    "downtime": "444",
+    "severity": "Critical",
+    "parts": "sdfghj",
+    "status": "Investigation",
+    "site": "Medupi",
+    "created_at": "2026-09-07T16:32:11.432867+00:00"
+  }
+]

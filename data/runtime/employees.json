@@ -1,0 +1,14 @@
+[
+  {
+    "id": "e5f61e4e-9062-4791-a6fd-b82289e3a3ca",
+    "full_name": "Clinton Bongani Khoza",
+    "employee_no": "MPG1001",
+    "title": "Super Admin",
+    "site": "Head Office",
+    "shift": "Office",
+    "hourly_rate": 0,
+    "status": "On Shift",
+    "role_slug": "super-admin",
+    "created_at": "2026-08-30T04:23:54.006064+00:00"
+  }
+]

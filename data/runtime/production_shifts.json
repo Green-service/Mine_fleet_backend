@@ -1,12 +1,32 @@
 [
   {
-    "id": "97f37ac4-74c5-4fe3-ad9e-97faea184fbf",
-    "created_at": "2026-08-30T05:51:44.897Z",
-    "work_date": "2026-08-30",
+    "id": "917463e2-cb59-4258-bf1b-f62ba9c26cb1",
+    "work_date": "2026-09-07",
     "site": "GG",
+    "shift": "Night Shift",
+    "target": 22,
+    "actual": 44,
+    "challenges": "ggg",
+    "created_at": "2026-09-07T16:06:38.918174+00:00"
+  },
+  {
+    "id": "460764ca-2e71-4a5b-b9ee-53889cf614d8",
+    "work_date": "2026-09-06",
+    "site": "BLF",
     "shift": "Day Shift",
+    "target": 0,
+    "actual": 0,
+    "challenges": "No major note captured",
+    "created_at": "2026-09-06T19:03:45.36968+00:00"
+  },
+  {
+    "id": "0c3b103b-3060-4bcf-9d5e-2bf9ca4fe3fb",
+    "work_date": "2026-09-06",
+    "site": "GG",
+    "shift": "Night Shift",
     "target": 2000,
-    "actual": 2100,
-    "challenges": "persist test 2"
+    "actual": 3000,
+    "challenges": "safe",
+    "created_at": "2026-09-06T17:33:28.664363+00:00"
   }
 ]

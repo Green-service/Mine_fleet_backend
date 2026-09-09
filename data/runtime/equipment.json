@@ -1,0 +1,24 @@
+[
+  {
+    "id": "2c56a67d-8d1e-46b6-b1f8-27f20dd1aa46",
+    "fleet_no": "CMPG044",
+    "equipment": "CATFEL",
+    "category": "Front-End Loader",
+    "site": "Grootegeluk",
+    "hours": 100,
+    "health": 100,
+    "status": "Operational",
+    "created_at": "2026-09-06T19:04:44.667963+00:00"
+  },
+  {
+    "id": "b4ac4d66-80c9-4715-9ac8-bde42a1e1f7a",
+    "fleet_no": "JNJJ",
+    "equipment": "nnjnjnjnj",
+    "category": "Articulated Dump Truck",
+    "site": "Grootegeluk",
+    "hours": 700,
+    "health": 100,
+    "status": "Operational",
+    "created_at": "2026-09-06T01:04:53.844693+00:00"
+  }
+]

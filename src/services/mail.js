@@ -1,6 +1,6 @@
 import { env } from "../config/env.js";
 
-import { buildNotificationEmailHtml } from "./mailTemplates.js";
+import { buildInviteEmailHtml, buildNotificationEmailHtml } from "./mailTemplates.js";
 
 function inviteMessage({ name, email, role, site, password, loginUrl }) {
   return [
@@ -68,8 +68,9 @@ export async function sendInviteEmail(params) {
     to: params.email,
     toName: params.name,
     title: "BRAINSTAK invite",
-    subject: "BRAINSTAK invite",
+    subject: "You've been invited to BRAINSTAK",
     message: inviteMessage(params),
+    html: buildInviteEmailHtml(params),
     templateParams: {
       role: params.role,
       site: params.site || "—",

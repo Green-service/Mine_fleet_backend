@@ -1,0 +1,44 @@
+[
+  {
+    "id": "25cefd84-3e06-4a86-a4a4-18e9dd609e54",
+    "work_date": "26/07/2026",
+    "work_time": "06:15",
+    "site": "Grootegeluk",
+    "machine": "CMPG044",
+    "operator": "T. Nkosi",
+    "opening": 18658,
+    "closing": 18777,
+    "litres": 2640,
+    "total_cost": 83556,
+    "approved_by": "Production Foreman",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "d1c29e7f-9d87-4e94-a02c-0c005ff4a25e",
+    "work_date": "26/07/2026",
+    "work_time": "06:22",
+    "site": "Grootegeluk",
+    "machine": "CMPG060",
+    "operator": "P. Maseko",
+    "opening": 8294,
+    "closing": 8410,
+    "litres": 2745,
+    "total_cost": 86879.25,
+    "approved_by": "Site Supervisor",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "0c582b65-3c45-4820-85c6-000a463c8233",
+    "work_date": "26/07/2026",
+    "work_time": "06:35",
+    "site": "Belfast",
+    "machine": "CTP013",
+    "operator": "L. Mokoena",
+    "opening": 5148,
+    "closing": 5276,
+    "litres": 2079,
+    "total_cost": 65800.35,
+    "approved_by": "Production Foreman",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  }
+]

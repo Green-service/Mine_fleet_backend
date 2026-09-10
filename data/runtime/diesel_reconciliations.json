@@ -1,1 +1,112 @@
-[]
+[
+  {
+    "id": "4c52b329-32f7-424b-a243-d6531b4dc178",
+    "work_date": "03/07/2026",
+    "received": "0 L",
+    "issued": "4,862 L",
+    "stock": "11,318 L",
+    "variance": "-204 L",
+    "status": "Review",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "bd196196-bb33-4ef8-a916-de1ba114caf3",
+    "work_date": "04/07/2026",
+    "received": "0 L",
+    "issued": "4,727 L",
+    "stock": "6,574 L",
+    "variance": "-221 L",
+    "status": "Review",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "8bc7b045-5a1c-4915-a1bb-6047f0caa7a6",
+    "work_date": "05/07/2026",
+    "received": "0 L",
+    "issued": "4,820 L",
+    "stock": "1,561 L",
+    "variance": "-414 L",
+    "status": "High Variance",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "90926779-15bc-4e8d-8a28-650c67f830fa",
+    "work_date": "06/07/2026",
+    "received": "2,034 L",
+    "issued": "3,845 L",
+    "stock": "509 L",
+    "variance": "+443 L",
+    "status": "High Variance",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "2891d8ff-a8b6-467e-8898-c27fc8a2b3df",
+    "work_date": "08/07/2026",
+    "received": "27,626 L",
+    "issued": "7,600 L",
+    "stock": "20,676 L",
+    "variance": "+184 L",
+    "status": "Review",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "ef96bd03-59b2-4d29-bb15-39d9537549b8",
+    "work_date": "11/07/2026",
+    "received": "20,003 L",
+    "issued": "4,072 L",
+    "stock": "25,592 L",
+    "variance": "+117 L",
+    "status": "Acceptable",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "9c46fa51-bb1d-4e6f-8c98-b3cfb2637def",
+    "work_date": "14/07/2026",
+    "received": "15,335 L",
+    "issued": "5,599 L",
+    "stock": "23,504 L",
+    "variance": "+136 L",
+    "status": "Acceptable",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "92b13445-d621-4778-805f-5d392ac1a3d8",
+    "work_date": "17/07/2026",
+    "received": "21,525 L",
+    "issued": "5,646 L",
+    "stock": "28,192 L",
+    "variance": "-830 L",
+    "status": "High Variance",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "379ea077-4429-4cca-9a62-31d6d18fdb17",
+    "work_date": "20/07/2026",
+    "received": "14,038 L",
+    "issued": "3,758 L",
+    "stock": "28,871 L",
+    "variance": "-10 L",
+    "status": "Acceptable",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "6f6311e8-2845-488c-b0a3-61f908db3d09",
+    "work_date": "27/07/2026",
+    "received": "21,969 L",
+    "issued": "6,342 L",
+    "stock": "16,701 L",
+    "variance": "+64 L",
+    "status": "Acceptable",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "c992e0d9-18a0-4f5c-b587-b7a6622e94bf",
+    "work_date": "31/07/2026",
+    "received": "28,036 L",
+    "issued": "5,327 L",
+    "stock": "24,137 L",
+    "variance": "-289 L",
+    "status": "Review",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  }
+]

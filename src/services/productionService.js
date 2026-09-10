@@ -1,5 +1,7 @@
 import * as catalog from "../data/catalog.js";
+import * as ref from "../data/referenceCatalog.js";
 import { deleteRow, insertRow, readTable, updateRow } from "./store.js";
+import { makeCollection, num as cnum, optNum, optStr, str } from "./collectionService.js";
 
 const SITE_CODE = {
   gg: "GG",
@@ -211,6 +213,26 @@ async function readHours() {
   return rows.map(toHourRow);
 }
 
+function hourPersistPayload(input, previous = {}) {
+  const machine = String(input.machine || previous.machine || "").trim();
+  if (!machine) {
+    const err = new Error("Enter a machine or fleet number.");
+    err.status = 400;
+    throw err;
+  }
+  return {
+    machine,
+    equipment: String(input.equipment ?? previous.equipment ?? "").trim(),
+    site: String(input.site || previous.site || "Belfast").trim(),
+    hours: num(input.hours ?? previous.hours),
+    downtime: num(input.downtime ?? previous.downtime),
+    standby: num(input.standby ?? previous.standby),
+    pm: num(input.pm ?? previous.pm),
+    status: String(input.status || previous.status || "Operational").trim(),
+    remarks: String(input.remarks ?? previous.remarks ?? "").trim(),
+  };
+}
+
 export async function getBoard() {
   const [daily, machineHoursBlf] = await Promise.all([readDaily(), readHours()]);
   return {
@@ -247,3 +269,163 @@ export async function removeShift(id) {
   await deleteRow("production_shifts", id, catalog.productionDaily);
   return { ok: true };
 }
+
+export async function captureHour(body) {
+  const payload = hourPersistPayload(body);
+  const saved = await insertRow("machine_hours", payload, catalog.machineHoursBlf);
+  return toHourRow({ ...payload, ...saved });
+}
+
+export async function updateHour(id, body) {
+  const hours = await readHours();
+  const previous = hours.find((row) => row.id === id);
+  if (!previous) {
+    const err = new Error("Machine hours record not found");
+    err.status = 404;
+    throw err;
+  }
+  const payload = hourPersistPayload(body, previous);
+  const saved = await updateRow("machine_hours", id, payload, catalog.machineHoursBlf);
+  return toHourRow({ ...previous, ...payload, ...saved, id });
+}
+
+export async function removeHour(id) {
+  await deleteRow("machine_hours", id, catalog.machineHoursBlf);
+  return { ok: true };
+}
+
+// ---------------------------------------------------------------------------
+// Static/historical registers migrated off local component state
+// ---------------------------------------------------------------------------
+
+function ggDailyRow(row) {
+  const target = cnum(row.target);
+  const actual = cnum(row.actual);
+  const variance = actual - target;
+  const pct = target ? Number(((actual / target) * 100).toFixed(1)) : 0;
+  return {
+    id: row.id,
+    date: row.work_date,
+    target,
+    actual,
+    variance,
+    pct,
+    status: pct >= 100 ? "Above Target" : "Below Target",
+  };
+}
+function ggDailyPayload(input, previous = {}) {
+  const workDate = str(input.date ?? input.work_date, previous.date);
+  if (!workDate) {
+    const err = new Error("Enter a date.");
+    err.status = 400;
+    throw err;
+  }
+  return { work_date: workDate, target: cnum(input.target ?? previous.target), actual: cnum(input.actual ?? previous.actual) };
+}
+export const ggDaily = makeCollection("production_gg_daily", ref.productionGgDaily, { toRow: ggDailyRow, toPayload: ggDailyPayload });
+
+function ggWeekRow(row) {
+  return {
+    id: row.id,
+    week: row.week,
+    range: row.range,
+    productLoader: row.product_loader,
+    sscc: row.sscc,
+    pci: row.pci,
+    snSs2: row.sn_ss2,
+    p2cSs2Be: row.p2c_ss2_be,
+    buffaloLoader: row.buffalo_loader,
+    screen: row.screen,
+    total: row.total,
+  };
+}
+export const ggWeek = makeCollection("production_gg_week", ref.productionGgWeek, { toRow: ggWeekRow });
+
+const FORECAST_PARTS = ["productLoading", "sscc", "pci", "gg78", "snSs2", "pscBf", "buffaloFeeder", "screening"];
+const FORECAST_COLS = { productLoading: "product_loading", sscc: "sscc", pci: "pci", gg78: "gg78", snSs2: "sn_ss2", pscBf: "psc_bf", buffaloFeeder: "buffalo_feeder", screening: "screening" };
+
+function forecastDailyRow(row) {
+  const out = { id: row.id, date: row.work_date };
+  let total = 0;
+  FORECAST_PARTS.forEach((key) => {
+    const value = cnum(row[FORECAST_COLS[key]]);
+    out[key] = value;
+    total += value;
+  });
+  out.total = row.total != null ? cnum(row.total) : total;
+  return out;
+}
+function forecastDailyPayload(input, previous = {}) {
+  const workDate = str(input.date ?? input.work_date, previous.date);
+  if (!workDate) {
+    const err = new Error("Enter a date.");
+    err.status = 400;
+    throw err;
+  }
+  const payload = { work_date: workDate };
+  let total = 0;
+  FORECAST_PARTS.forEach((key) => {
+    const value = cnum(input[key] ?? previous[key]);
+    payload[FORECAST_COLS[key]] = value;
+    total += value;
+  });
+  payload.total = total;
+  return payload;
+}
+export const forecastDaily = makeCollection("production_forecast_daily", ref.productionForecastDaily, { toRow: forecastDailyRow, toPayload: forecastDailyPayload });
+
+function forecastWeekRow(row) {
+  return {
+    id: row.id,
+    week: row.week,
+    productLoading: row.product_loading,
+    sscc: row.sscc,
+    pci: row.pci,
+    snSs2: row.sn_ss2,
+    pscBf: row.psc_bf,
+    buffaloFeeder: row.buffalo_feeder,
+    screening: row.screening,
+    total: row.total,
+  };
+}
+export const forecastWeek = makeCollection("production_forecast_week", ref.productionForecastWeek, { toRow: forecastWeekRow });
+
+function blfDailyRow(row) {
+  return {
+    id: row.id,
+    date: row.work_date,
+    machine: row.machine,
+    opening: row.opening,
+    closing: row.closing,
+    total: row.total,
+    downtime: row.downtime,
+    standby: row.standby,
+    pm: row.pm,
+    notes: row.notes,
+  };
+}
+function blfDailyPayload(input, previous = {}) {
+  const machine = str(input.machine, previous.machine);
+  if (!machine) {
+    const err = new Error("Enter a machine.");
+    err.status = 400;
+    throw err;
+  }
+  return {
+    work_date: str(input.date ?? input.work_date, previous.date),
+    machine,
+    opening: cnum(input.opening ?? previous.opening),
+    closing: cnum(input.closing ?? previous.closing),
+    total: cnum(input.total ?? previous.total),
+    downtime: cnum(input.downtime ?? previous.downtime),
+    standby: cnum(input.standby ?? previous.standby),
+    pm: cnum(input.pm ?? previous.pm),
+    notes: optStr(input.notes, previous.notes),
+  };
+}
+export const blfDaily = makeCollection("production_blf_daily", ref.productionBlfDaily, { toRow: blfDailyRow, toPayload: blfDailyPayload });
+
+function ggHoursRow(row) {
+  return { id: row.id, machine: row.machine, total: row.total, downtime: row.downtime, standby: row.standby, pm: row.pm, status: row.status };
+}
+export const ggHours = makeCollection("production_gg_hours", ref.productionGgHours, { toRow: ggHoursRow });

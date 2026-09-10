@@ -22,9 +22,14 @@ export const env = {
     process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ||
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
     "",
+  supabaseServiceKey: process.env.SUPABASE_SERVICE_ROLE_KEY || "",
+  supabaseAnonKey:
+    process.env.SUPABASE_ANON_KEY ||
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ||
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
+    "",
   supabaseStorageBucket: process.env.SUPABASE_STORAGE_BUCKET || "documents",
   demoEmail: process.env.DEMO_EMAIL || "clintonbonganikhoza@gmail.com",
-  demoPassword: process.env.DEMO_PASSWORD || "salvation",
   emailjsServiceId: process.env.EMAILJS_SERVICE_ID || "",
   emailjsTemplateId: process.env.EMAILJS_TEMPLATE_ID || "",
   emailjsPublicKey: process.env.EMAILJS_PUBLIC_KEY || "",

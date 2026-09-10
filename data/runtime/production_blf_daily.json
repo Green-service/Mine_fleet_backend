@@ -1,0 +1,80 @@
+[
+  {
+    "id": "8f06a806-2f59-4cc8-ac4a-a850ba747b92",
+    "work_date": "01/07/2026",
+    "machine": "CMPG110",
+    "opening": 16371,
+    "closing": 16389,
+    "total": 18,
+    "downtime": 0,
+    "standby": 0,
+    "pm": 2,
+    "notes": "Greasing and inspection",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "2c37e55d-eade-4fdf-97f0-a14f541bb68e",
+    "work_date": "01/07/2026",
+    "machine": "CMPG004",
+    "opening": 25114,
+    "closing": 25120,
+    "total": 6,
+    "downtime": 0,
+    "standby": 2,
+    "pm": 8,
+    "notes": "Smoking issue and system update",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "d84b4ce0-3678-40d6-bb9e-cfab3edc46e0",
+    "work_date": "01/07/2026",
+    "machine": "CMPG009",
+    "opening": 27062,
+    "closing": 27076,
+    "total": 14,
+    "downtime": 0,
+    "standby": 0,
+    "pm": 4,
+    "notes": "System update",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "e80d0069-f62a-43ad-83d7-131931eacb0f",
+    "work_date": "01/07/2026",
+    "machine": "CMPG014",
+    "opening": 16215,
+    "closing": 16234,
+    "total": 19,
+    "downtime": 0,
+    "standby": 0,
+    "pm": 0,
+    "notes": "No major breakdown recorded",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "b4aae991-31a1-4760-a8e7-f154c8f36dfb",
+    "work_date": "01/07/2026",
+    "machine": "CMPG006",
+    "opening": 10167,
+    "closing": 10179,
+    "total": 12,
+    "downtime": 0,
+    "standby": 0,
+    "pm": 0,
+    "notes": "No major breakdown recorded",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "975080cc-bdb3-4bd0-b931-13b9eae14733",
+    "work_date": "01/07/2026",
+    "machine": "CPT021",
+    "opening": 3354,
+    "closing": 3354,
+    "total": 0,
+    "downtime": 0,
+    "standby": 15,
+    "pm": 0,
+    "notes": "Standby",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  }
+]

@@ -1,0 +1,32 @@
+[
+  {
+    "id": "eb5cc876-aca9-42dc-b88d-b2fc5bffe5ab",
+    "machine": "CMPG003",
+    "total": "Auto from GG register",
+    "downtime": "Auto",
+    "standby": "Auto",
+    "pm": "Auto",
+    "status": "Tracked",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "3743dbc0-10b4-4ea2-a810-1ec3f5cf18ec",
+    "machine": "CMPG004",
+    "total": "Auto from GG register",
+    "downtime": "Auto",
+    "standby": "Auto",
+    "pm": "Auto",
+    "status": "Tracked",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "cdcddd3b-8deb-4c06-86a4-aacc03267fc1",
+    "machine": "CMPG009",
+    "total": "Auto from GG register",
+    "downtime": "Auto",
+    "standby": "Auto",
+    "pm": "Auto",
+    "status": "Tracked",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  }
+]

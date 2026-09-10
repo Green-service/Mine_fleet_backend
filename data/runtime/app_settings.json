@@ -1,9 +1,9 @@
 [
   {
     "id": "default",
-    "default_site": "Grootegeluk",
+    "default_site": "Head Office",
     "diesel_cost_per_litre": 31.65,
     "availability_target": 90,
-    "updated_at": "2026-08-31T13:04:37.69559+00:00"
+    "updated_at": "2026-09-09T20:24:11.207946+00:00"
   }
 ]

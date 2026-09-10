@@ -1,6 +1,8 @@
 import * as catalog from "../data/catalog.js";
+import * as ref from "../data/referenceCatalog.js";
 import { recordSystemEvent } from "./notifications.js";
 import { deleteRow, insertRow, readTable, updateRow } from "./store.js";
+import { makeCollection, num as cnum, optStr, str } from "./collectionService.js";
 
 const FUEL_TYPES = ["Petrol 95", "Petrol 93", "Diesel 50"];
 
@@ -229,3 +231,93 @@ export async function removeIssue(id, actor = null) {
   }
   return { ok: true };
 }
+
+// ---------------------------------------------------------------------------
+// Static/historical registers migrated off local component state
+// ---------------------------------------------------------------------------
+
+function byMachineRow(row) {
+  const litres = cnum(row.litres);
+  const costPerL = cnum(row.cost_per_litre);
+  const hours = cnum(row.hours);
+  return {
+    id: row.id,
+    machine: row.machine,
+    site: row.site,
+    litres,
+    costPerL: `R${costPerL.toFixed(2)}`,
+    totalCost: `R${(litres * costPerL).toLocaleString("en-ZA", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+    hours,
+    lPerHr: hours ? Number((litres / hours).toFixed(1)) : 0,
+    status: row.status,
+  };
+}
+export const byMachine = makeCollection("diesel_by_machine", ref.dieselConsumptionByMachine, { toRow: byMachineRow });
+
+function transactionRow(row) {
+  return {
+    id: row.id,
+    date: row.work_date,
+    time: row.work_time,
+    site: row.site,
+    machine: row.machine,
+    operator: row.operator,
+    opening: row.opening,
+    closing: row.closing,
+    litres: row.litres,
+    totalCost: row.total_cost,
+    approvedBy: row.approved_by,
+  };
+}
+function transactionPayload(input, previous = {}) {
+  const machine = str(input.machine, previous.machine);
+  if (!machine) {
+    const err = new Error("Enter a machine.");
+    err.status = 400;
+    throw err;
+  }
+  return {
+    work_date: str(input.date ?? input.work_date, previous.date),
+    work_time: optStr(input.time, previous.time),
+    site: optStr(input.site, previous.site),
+    machine,
+    operator: optStr(input.operator, previous.operator),
+    opening: cnum(input.opening ?? previous.opening),
+    closing: cnum(input.closing ?? previous.closing),
+    litres: cnum(input.litres ?? previous.litres),
+    total_cost: cnum(input.totalCost ?? previous.totalCost),
+    approved_by: optStr(input.approvedBy, previous.approvedBy),
+  };
+}
+export const transactions = makeCollection("diesel_transactions", ref.dieselTransactions, { toRow: transactionRow, toPayload: transactionPayload });
+
+function typeRow(row) {
+  return { id: row.id, type: row.type, litres: row.litres, pct: row.pct };
+}
+export const byType = makeCollection("diesel_consumption_by_type", ref.dieselConsumptionByType, { toRow: typeRow });
+
+function topConsumerRow(row) {
+  return { id: row.id, machine: row.machine, type: row.type, litres: row.litres, hours: row.hours, lPerHr: row.l_per_hr, status: row.status };
+}
+export const topConsumers = makeCollection("diesel_top_consumers", ref.dieselTopConsumers, { toRow: topConsumerRow });
+
+function reconRow(row) {
+  return { id: row.id, date: row.work_date, received: row.received, issued: row.issued, stock: row.stock, variance: row.variance, status: row.status };
+}
+function reconPayload(input, previous = {}) {
+  const workDate = str(input.date ?? input.work_date, previous.date);
+  if (!workDate) {
+    const err = new Error("Enter a date.");
+    err.status = 400;
+    throw err;
+  }
+  return {
+    work_date: workDate,
+    received: optStr(input.received, previous.received),
+    issued: optStr(input.issued, previous.issued),
+    stock: optStr(input.stock, previous.stock),
+    variance: optStr(input.variance, previous.variance),
+    status: optStr(input.status, previous.status) || "Review",
+  };
+}
+export const dailyReconciliation = makeCollection("diesel_reconciliations", ref.dieselReconciliations, { toRow: reconRow, toPayload: reconPayload });

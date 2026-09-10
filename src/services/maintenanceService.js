@@ -1,7 +1,9 @@
 import * as catalog from "../data/catalog.js";
+import * as ref from "../data/referenceCatalog.js";
 import { deleteRow, insertRow, readTable, updateRow } from "./store.js";
 import { getAssets } from "./assetsService.js";
 import { notifyAllUsers, recordSystemEvent } from "./notifications.js";
+import { makeCollection, num as cnum, optStr, str } from "./collectionService.js";
 function parseDate(value) {
   if (!value) return null;
   if (value instanceof Date && !Number.isNaN(value.getTime())) return value;
@@ -243,3 +245,100 @@ export async function removeWorkOrder(id, actor = null) {
   }
   return { ok: true };
 }
+
+// ---------------------------------------------------------------------------
+// Static/historical registers migrated off local component state
+// ---------------------------------------------------------------------------
+
+function fullRegisterRow(row) {
+  return { id: row.id, fleetNo: row.fleet_no, machine: row.machine, status: row.status, reason: row.reason, action: row.action };
+}
+function fullRegisterPayload(input, previous = {}) {
+  const fleetNo = str(input.fleetNo ?? input.fleet_no, previous.fleetNo).toUpperCase();
+  if (!fleetNo) {
+    const err = new Error("Enter a fleet number.");
+    err.status = 400;
+    throw err;
+  }
+  return {
+    fleet_no: fleetNo,
+    machine: optStr(input.machine, previous.machine),
+    status: optStr(input.status, previous.status) || "Operational",
+    reason: optStr(input.reason, previous.reason),
+    action: optStr(input.action, previous.action),
+  };
+}
+export const fullRegister = makeCollection("attention_machines", ref.maintenanceFullRegister, { toRow: fullRegisterRow, toPayload: fullRegisterPayload });
+
+export async function listMachinesNeedingAttention() {
+  const rows = await fullRegister.list();
+  return rows.filter((row) => row.status && row.status !== "Operational");
+}
+
+function statusByGroupRow(row) {
+  return { id: row.id, group: row.group_name, total: row.total, operational: row.operational, attention: row.attention, pct: row.pct };
+}
+export const statusByGroup = makeCollection("maintenance_status_by_group", ref.maintenanceStatusByGroup, { toRow: statusByGroupRow });
+
+function formatHoursLeft(value) {
+  // hours_left is stored numeric, but the UI expects a signed label like
+  // "+442"/"-7" — Postgres normalizes "+442" to 442 on write, so the sign
+  // has to be reconstructed here rather than trusted from storage.
+  if (value === null || value === undefined || value === "") return "";
+  const n = Number(value);
+  if (!Number.isFinite(n)) return String(value);
+  return n >= 0 ? `+${n}` : `${n}`;
+}
+
+function servicePlanStaticRow(row) {
+  return {
+    id: row.id,
+    fleetNo: row.fleet_no,
+    make: row.make,
+    model: row.model,
+    hours: row.hours,
+    nextService: row.next_service,
+    hoursLeft: formatHoursLeft(row.hours_left),
+    planned: row.due_date,
+    status: row.status,
+    notes: row.notes,
+  };
+}
+export const servicePlanStatic = makeCollection("service_plans", ref.maintenanceServicePlan, { toRow: servicePlanStaticRow });
+
+function backlogRow(row) {
+  return {
+    id: row.id,
+    site: row.site,
+    fleet: row.fleet,
+    defect: row.defect,
+    risk: row.risk,
+    cost: row.cost,
+    order: row.order_status,
+    orderNo: row.order_no,
+    parts: row.parts_status,
+    foreman: row.foreman,
+    start: row.planned_start,
+  };
+}
+function backlogPayload(input, previous = {}) {
+  const defect = str(input.defect, previous.defect);
+  if (!defect) {
+    const err = new Error("Describe the defect or task.");
+    err.status = 400;
+    throw err;
+  }
+  return {
+    site: optStr(input.site, previous.site),
+    fleet: str(input.fleet, previous.fleet),
+    defect,
+    risk: optStr(input.risk, previous.risk) || "Medium",
+    cost: optStr(input.cost, previous.cost),
+    order_status: optStr(input.order, previous.order),
+    order_no: optStr(input.orderNo, previous.orderNo),
+    parts_status: optStr(input.parts, previous.parts),
+    foreman: optStr(input.foreman, previous.foreman),
+    planned_start: optStr(input.start, previous.start),
+  };
+}
+export const backlog = makeCollection("maintenance_backlog", ref.maintenanceBacklog, { toRow: backlogRow, toPayload: backlogPayload });

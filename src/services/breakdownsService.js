@@ -1,6 +1,8 @@
 import * as catalog from "../data/catalog.js";
+import * as ref from "../data/referenceCatalog.js";
 import { recordSystemEvent } from "./notifications.js";
 import { deleteRow, insertRow, readTable, updateRow } from "./store.js";
+import { makeCollection, num as cnum, optStr, str } from "./collectionService.js";
 
 const SEVERITY_RANK = { Critical: 0, Major: 1, Moderate: 2, Minor: 3 };
 
@@ -132,3 +134,53 @@ export async function removeBreakdown(id, actor = null) {
   }
   return { ok: true };
 }
+
+// ---------------------------------------------------------------------------
+// Static/historical registers migrated off local component state
+// ---------------------------------------------------------------------------
+
+function inventoryRow(row) {
+  return { id: row.id, site: row.site, category: row.category, part: row.part, desc: row.description, qty: row.qty, equipment: row.equipment, status: row.status };
+}
+function inventoryPayload(input, previous = {}) {
+  const site = str(input.site, previous.site);
+  const desc = str(input.desc, previous.desc);
+  if (!site) {
+    const err = new Error("Enter a site or location.");
+    err.status = 400;
+    throw err;
+  }
+  if (!desc) {
+    const err = new Error("Enter a part description.");
+    err.status = 400;
+    throw err;
+  }
+  return {
+    site,
+    category: optStr(input.category, previous.category),
+    part: optStr(input.part, previous.part),
+    description: desc,
+    qty: optStr(input.qty, previous.qty),
+    equipment: optStr(input.equipment, previous.equipment),
+    status: optStr(input.status, previous.status) || "In Stock",
+  };
+}
+export const inventory = makeCollection("breakdowns_inventory", ref.breakdownsInventory, { toRow: inventoryRow, toPayload: inventoryPayload });
+
+export async function listCriticalSpares() {
+  const rows = await inventory.list();
+  return rows
+    .filter((row) => row.status === "Required" || row.status === "Low Stock")
+    .map((row) => ({
+      site: row.site,
+      item: row.desc,
+      equipment: row.equipment,
+      status: row.status,
+      action: row.status === "Required" ? "Create procurement request" : "Monitor stock level",
+    }));
+}
+
+function availabilityRow(row) {
+  return { id: row.id, plant: row.plant, type: row.type, hoursWorked: row.hours_worked, breakdownHours: row.breakdown_hours, failures: row.failures, availability: row.availability, status: row.status };
+}
+export const availability = makeCollection("breakdowns_availability", ref.breakdownsAvailability, { toRow: availabilityRow });

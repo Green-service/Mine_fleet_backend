@@ -1,0 +1,612 @@
+[
+  {
+    "id": "f48f8869-6073-447e-8042-f7d2306869f7",
+    "site": "Belfast",
+    "team": "BLF",
+    "position": "Safety Officer",
+    "candidate_name": "T Manzini",
+    "status": "Filled",
+    "medical": "Valid",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "1017d8ea-8445-4568-8099-5e986abda0b0",
+    "site": "Belfast",
+    "team": "Engineering",
+    "position": "Diesel Mechanic",
+    "candidate_name": "R Mashabane",
+    "status": "Filled",
+    "medical": "Valid",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "ec05a744-0b36-407e-8497-9843d7047f24",
+    "site": "Belfast",
+    "team": "Engineering",
+    "position": "Diesel Mechanic Assistant",
+    "candidate_name": "BE Mahlangu",
+    "status": "Filled",
+    "medical": "Valid",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "85a51226-ace5-49e1-807e-72e571f6d8f3",
+    "site": "Belfast",
+    "team": "BLF",
+    "position": "Logistic Controller",
+    "candidate_name": "R Libago",
+    "status": "Filled",
+    "medical": "Valid",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "4d6ab617-70dd-4bc2-b822-a111b53740b3",
+    "site": "Belfast",
+    "team": "BLF",
+    "position": "Logistic Controller",
+    "candidate_name": "N Kunene",
+    "status": "Filled",
+    "medical": "Valid",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "fce57ae3-0fe6-40b2-b75b-b986a65a90ae",
+    "site": "Belfast",
+    "team": "BLF",
+    "position": "Logistic Controller",
+    "candidate_name": "T Shabangu",
+    "status": "Filled",
+    "medical": "Valid",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "daf1d81e-d0c3-4dc2-8bcf-2bb76956bf83",
+    "site": "Belfast",
+    "team": "BLF",
+    "position": "Logistic Controller",
+    "candidate_name": "EM Molefe",
+    "status": "Filled",
+    "medical": "Valid",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "b4bc271f-cc9b-4a36-9425-67c1f520d531",
+    "site": "Belfast",
+    "team": "BLF",
+    "position": "Cleaner",
+    "candidate_name": "T Mdhluli",
+    "status": "Filled",
+    "medical": "Valid",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "b1f9745f-e94d-4812-a4a8-7df2a1f2a94b",
+    "site": "Belfast",
+    "team": "Shift A",
+    "position": "Supervisor",
+    "candidate_name": "M Nkambule",
+    "status": "Filled",
+    "medical": "Valid",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "85452e6a-2f69-4169-a533-50bf10a0e8e2",
+    "site": "Belfast",
+    "team": "Shift A",
+    "position": "FEL Op",
+    "candidate_name": "S Jele",
+    "status": "Filled",
+    "medical": "Valid",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "7bc1474e-0835-4efe-a2f4-87a7a8d2c8d7",
+    "site": "Belfast",
+    "team": "Shift A",
+    "position": "FEL Op",
+    "candidate_name": "S Mahlangu",
+    "status": "Filled",
+    "medical": "Valid",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "2d80d898-5d77-42fc-82ff-ae8b01531c88",
+    "site": "Belfast",
+    "team": "Shift A",
+    "position": "FEL Op",
+    "candidate_name": "E Maroga",
+    "status": "Filled",
+    "medical": "Valid",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "88176f3c-a4cd-4067-b695-22aa13488f62",
+    "site": "Belfast",
+    "team": "Shift A",
+    "position": "MultiSkilled Op",
+    "candidate_name": "M Masombuka",
+    "status": "Filled",
+    "medical": "Valid",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "2440f5ad-f136-487c-8209-0e099b38edce",
+    "site": "Belfast",
+    "team": "Shift A",
+    "position": "Water Truck Op",
+    "candidate_name": "S Mthethwa",
+    "status": "Filled",
+    "medical": "Valid",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "36c2db6e-13ac-46c2-83a9-bf094688d0a7",
+    "site": "Belfast",
+    "team": "Shift B",
+    "position": "Supervisor",
+    "candidate_name": "M Mbokazi",
+    "status": "Filled",
+    "medical": "Valid",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "5c699cd0-2cdd-4291-b0c3-6780334c4aea",
+    "site": "Belfast",
+    "team": "Shift B",
+    "position": "Water Truck Op",
+    "candidate_name": "B Mnisi",
+    "status": "Filled",
+    "medical": "Valid",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "d3ee60b9-b78d-4a92-9b1c-7da59929885b",
+    "site": "Belfast",
+    "team": "Shift B",
+    "position": "FEL Op",
+    "candidate_name": "S Makuwa",
+    "status": "Filled",
+    "medical": "Valid",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "7caf4c5d-8028-4d17-9334-c992bdea96e7",
+    "site": "Belfast",
+    "team": "Shift B",
+    "position": "FEL Op",
+    "candidate_name": "J Maredi",
+    "status": "Filled",
+    "medical": "Valid",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "526f7a2f-2c7f-4d8d-a339-d7e8c445bfc3",
+    "site": "Belfast",
+    "team": "Shift B",
+    "position": "FEL Op",
+    "candidate_name": "VM Mahlalela",
+    "status": "Filled",
+    "medical": "Valid",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "c3b61f16-4392-4e3b-a1d3-15664df72514",
+    "site": "Belfast",
+    "team": "Shift B",
+    "position": "Water Truck Op",
+    "candidate_name": "M Motshwa",
+    "status": "Filled",
+    "medical": "Valid",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "cb52bb36-d381-4c91-bfc0-26d5f766b863",
+    "site": "Belfast",
+    "team": "Shift C",
+    "position": "Supervisor",
+    "candidate_name": "V Shongwe",
+    "status": "Filled",
+    "medical": "Valid",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "882e670c-abbf-463d-8d15-ae835680a105",
+    "site": "Belfast",
+    "team": "Shift C",
+    "position": "FEL Op",
+    "candidate_name": "W Mahlangu",
+    "status": "Filled",
+    "medical": "Valid",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "21afbb21-cfcf-4592-b82c-f04a20fe1bae",
+    "site": "Belfast",
+    "team": "Shift C",
+    "position": "FEL Op",
+    "candidate_name": "W Tlou",
+    "status": "Filled",
+    "medical": "Valid",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "49dd2731-f194-42d8-8a26-e52030eada78",
+    "site": "Belfast",
+    "team": "Shift C",
+    "position": "FEL Op",
+    "candidate_name": "D Zondo",
+    "status": "Filled",
+    "medical": "Valid",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "0b2c41d6-66e9-4eaa-8e2e-b059affe75da",
+    "site": "Belfast",
+    "team": "Shift C",
+    "position": "FEL Op",
+    "candidate_name": "D Motau",
+    "status": "Filled",
+    "medical": "Valid",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "10996659-59b2-47ef-866a-67b1ebe3415b",
+    "site": "Belfast",
+    "team": "Shift C",
+    "position": "VACANCY",
+    "candidate_name": "Vacant",
+    "status": "Vacant",
+    "medical": "—",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "ce64a196-87b7-4e97-ab84-8e0c61318c63",
+    "site": "GG",
+    "team": "GG",
+    "position": "Asset Manager",
+    "candidate_name": "T Ratsaka",
+    "status": "Filled",
+    "medical": "Valid",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "a524580e-1fc4-426e-a291-0b0b4b3441f1",
+    "site": "GG",
+    "team": "GG",
+    "position": "Engineering Foreman",
+    "candidate_name": "Martin Phadu",
+    "status": "Filled",
+    "medical": "Valid",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "3a35e859-1a32-45de-86ea-f2ee68353758",
+    "site": "GG",
+    "team": "Engineering",
+    "position": "Sen Diesel Mechanic",
+    "candidate_name": "S Mampuru",
+    "status": "Filled",
+    "medical": "Valid",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "b740c41c-4b1c-435f-ab2c-1f1cd5e89741",
+    "site": "GG",
+    "team": "Engineering",
+    "position": "Diesel Mechanic",
+    "candidate_name": "Lebone Malatsi",
+    "status": "Filled",
+    "medical": "—",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "1eeb8a70-fcbe-4529-baf3-cbe5c754de5e",
+    "site": "GG",
+    "team": "Engineering",
+    "position": "Diesel Mechanic",
+    "candidate_name": "Chris Rabyanyana",
+    "status": "Filled",
+    "medical": "Valid",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "ac260eae-a128-4bf0-9ef3-4f04e46a6dd2",
+    "site": "GG",
+    "team": "Engineering",
+    "position": "Junior Diesel Mechanic",
+    "candidate_name": "Shelly Mudau",
+    "status": "Filled",
+    "medical": "—",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "1a1c2f6a-cf08-4781-bd1b-1babe89a114b",
+    "site": "GG",
+    "team": "Engineering",
+    "position": "Diesel Mechanic Assistant",
+    "candidate_name": "L Moutlana",
+    "status": "Filled",
+    "medical": "Valid",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "afdacc5b-3ef9-4d3a-8041-8b9ac978183e",
+    "site": "GG",
+    "team": "Engineering",
+    "position": "Diesel Mechanic Assistant",
+    "candidate_name": "M Nemalili",
+    "status": "Filled",
+    "medical": "Valid",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "d5a0c1f0-4ac0-4f69-a2b1-3d82169f64a4",
+    "site": "GG",
+    "team": "Engineering",
+    "position": "Diesel Mechanic Assistant",
+    "candidate_name": "K Mojela",
+    "status": "Filled",
+    "medical": "Valid",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "0ab779c4-8a98-4513-8ce6-6cf5865c01a3",
+    "site": "GG",
+    "team": "Engineering",
+    "position": "Diesel Mechanic Assistant",
+    "candidate_name": "Lerato Sathekge",
+    "status": "Filled",
+    "medical": "Valid",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "9ed99f36-a6d2-4763-b775-43f5b1c39bee",
+    "site": "GG",
+    "team": "Engineering",
+    "position": "Diesel Attendant",
+    "candidate_name": "J Matshabapala",
+    "status": "Filled",
+    "medical": "Valid",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "09fd9b46-050e-419a-9242-57e1a5d2e646",
+    "site": "GG",
+    "team": "Engineering",
+    "position": "Diesel Mechanic Assistant",
+    "candidate_name": "Vacant",
+    "status": "Vacant",
+    "medical": "—",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "0de88117-8818-434e-9cdc-166521e81f58",
+    "site": "GG",
+    "team": "Engineering",
+    "position": "General worker",
+    "candidate_name": "Prince Mokobu",
+    "status": "Filled",
+    "medical": "—",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "5d39edfc-e754-4b34-be1b-626ca59e6be5",
+    "site": "GG",
+    "team": "Engineering",
+    "position": "Driver",
+    "candidate_name": "Nchabeleng",
+    "status": "Filled",
+    "medical": "—",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "8f14d9d5-0b3e-4f09-989e-39e5ce25a5a8",
+    "site": "Head Office",
+    "team": "HO",
+    "position": "Operations and Business Development Manager",
+    "candidate_name": "P Lekgau",
+    "status": "Filled",
+    "medical": "—",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "268b2365-7cc2-48c0-9a38-bb12a18a6b7e",
+    "site": "Head Office",
+    "team": "HO Middelburg",
+    "position": "Safety Manager",
+    "candidate_name": "V Makhetha",
+    "status": "Filled",
+    "medical": "—",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "25fd2c28-2900-4eb4-9bcf-52603bec9f6e",
+    "site": "Head Office",
+    "team": "HO Fourways",
+    "position": "Group Finance Manager",
+    "candidate_name": "G Tlotlomadi",
+    "status": "Filled",
+    "medical": "—",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "c47f4103-97d6-4657-818e-a4a524d531c2",
+    "site": "Head Office",
+    "team": "HO Middelburg",
+    "position": "Group Payroll and ER Manager",
+    "candidate_name": "P Sishange",
+    "status": "Filled",
+    "medical": "—",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "9b505552-1c4c-45a8-b229-dda2ba163826",
+    "site": "Head Office",
+    "team": "HO Middelburg",
+    "position": "HR and Governance Manager",
+    "candidate_name": "S Samuels",
+    "status": "Filled",
+    "medical": "—",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "16da4b23-e317-4094-8bc0-cfd4a56e47fa",
+    "site": "Head Office",
+    "team": "HO Fourways",
+    "position": "Group Junior Accountant",
+    "candidate_name": "K Mokgalapa",
+    "status": "Filled",
+    "medical": "—",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "58348f05-c74f-4f2a-beb0-234cdd8519e9",
+    "site": "Head Office",
+    "team": "HO Fourways",
+    "position": "PA / Aupair",
+    "candidate_name": "L Du Toit",
+    "status": "Filled",
+    "medical": "—",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "f335df6e-7d9a-4908-9a68-6550fb06dbad",
+    "site": "Head Office",
+    "team": "HO Fourways",
+    "position": "Bookkeeper",
+    "candidate_name": "S Mazibuko",
+    "status": "Filled",
+    "medical": "—",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "4727f655-5b59-4f9a-9349-3e1dbd9e05e9",
+    "site": "Head Office",
+    "team": "HO Middelburg",
+    "position": "HR Intern",
+    "candidate_name": "A Sibanyoni",
+    "status": "Filled",
+    "medical": "—",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "6ca8f3e6-b51f-4201-b1c7-e396bf719de7",
+    "site": "Head Office",
+    "team": "HO Middelburg",
+    "position": "Payroll and HR Admin",
+    "candidate_name": "V Ndou",
+    "status": "Filled",
+    "medical": "—",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "3797f8a4-eb71-4c82-89c7-f04a07e5f278",
+    "site": "Head Office",
+    "team": "HO",
+    "position": "Business Development Manager",
+    "candidate_name": "Vacant",
+    "status": "Advert Pending",
+    "medical": "—",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "eb13e123-d6b3-4fa2-887e-f724deb46a5f",
+    "site": "Head Office",
+    "team": "HO Fourways",
+    "position": "Junior Bookkeeper",
+    "candidate_name": "A Molefhalo",
+    "status": "Filled",
+    "medical": "—",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "f7a53067-d066-42e6-afc2-baf050f4ab40",
+    "site": "Head Office",
+    "team": "HO Middelburg",
+    "position": "Business Improvement Intern",
+    "candidate_name": "T Mabuza",
+    "status": "Filled",
+    "medical": "—",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "2dd8221d-22b6-48fc-a0ba-443395a51308",
+    "site": "Head Office",
+    "team": "HO Middelburg",
+    "position": "Industrial Engineering Intern",
+    "candidate_name": "T Moloantoa",
+    "status": "Filled",
+    "medical": "—",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "f4928f51-c2fd-4e93-a0de-09ebf3b66ca9",
+    "site": "Head Office",
+    "team": "HO Middelburg",
+    "position": "Engineering clerk intern",
+    "candidate_name": "B Mohlala",
+    "status": "Filled",
+    "medical": "—",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "7a68f7dc-5f9d-488c-8a34-914d1ec330d4",
+    "site": "Head Office",
+    "team": "HO Middelburg",
+    "position": "Receptionist",
+    "candidate_name": "C Botha",
+    "status": "Filled",
+    "medical": "—",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "0628dbae-74e4-4983-a8ea-57f93c87a78c",
+    "site": "Head Office",
+    "team": "HO Middelburg",
+    "position": "Cleaner",
+    "candidate_name": "S Masemola",
+    "status": "Filled",
+    "medical": "—",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "45ae56bc-9f41-4c43-8080-7bcc8658286d",
+    "site": "Head Office",
+    "team": "HO Middelburg",
+    "position": "Industrial Engineering Intern",
+    "candidate_name": "Vacant",
+    "status": "Shortlisting",
+    "medical": "—",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "283a8c64-ca94-4332-b96e-1caa10207f5a",
+    "site": "Head Office",
+    "team": "HO Middelburg",
+    "position": "Quality Surveying Intern",
+    "candidate_name": "Vacant",
+    "status": "Shortlisting",
+    "medical": "—",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "12d9d19b-5a2c-4992-985b-4756defcc49e",
+    "site": "Head Office",
+    "team": "HO Middelburg",
+    "position": "Safety Intern",
+    "candidate_name": "Vacant",
+    "status": "Shortlisting",
+    "medical": "—",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "c8f49b71-64c4-4efc-9af0-88cee77767b8",
+    "site": "Head Office",
+    "team": "HO Middelburg",
+    "position": "Mechanical Engineer Intern",
+    "candidate_name": "Vacant",
+    "status": "Shortlisting",
+    "medical": "—",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  }
+]

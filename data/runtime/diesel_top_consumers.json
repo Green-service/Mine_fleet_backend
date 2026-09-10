@@ -1,0 +1,102 @@
+[
+  {
+    "id": "262c8b12-e2ad-4bb5-8334-f222606e14ed",
+    "machine": "CMPG044",
+    "type": "FEL",
+    "litres": "8,003 L",
+    "hours": 394,
+    "l_per_hr": 20.31,
+    "status": "Investigate",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "18c52e5d-6531-4a7d-80d9-f9dd92f154de",
+    "machine": "CMPG050",
+    "type": "FEL",
+    "litres": "7,588 L",
+    "hours": 432,
+    "l_per_hr": 17.56,
+    "status": "Normal",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "08bcadf2-1e56-4b05-98ab-b32339e80448",
+    "machine": "CTP023",
+    "type": "FEL",
+    "litres": "7,283 L",
+    "hours": 429,
+    "l_per_hr": 16.98,
+    "status": "Normal",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "e22830ce-04b4-43f9-9c78-403fccb3592a",
+    "machine": "TT125",
+    "type": "ADT",
+    "litres": "7,116 L",
+    "hours": 386,
+    "l_per_hr": 18.44,
+    "status": "Monitor",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "a4071d12-cc35-4c44-8a4e-9edc4a3d2ecb",
+    "machine": "CMPG092",
+    "type": "ADT",
+    "litres": "7,042 L",
+    "hours": 405,
+    "l_per_hr": 17.39,
+    "status": "Normal",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "32de260f-87bf-4d1e-ae03-e23c97863e05",
+    "machine": "TT120",
+    "type": "ADT",
+    "litres": "6,644 L",
+    "hours": 354,
+    "l_per_hr": 18.77,
+    "status": "Monitor",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "8adb2b3e-a06c-41c9-af31-1671784e4329",
+    "machine": "CMPG091",
+    "type": "ADT",
+    "litres": "6,625 L",
+    "hours": 347,
+    "l_per_hr": 19.09,
+    "status": "Monitor",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "5367d556-0476-4a35-925a-7f3baaef7dc3",
+    "machine": "CMPG094",
+    "type": "ADT",
+    "litres": "6,494 L",
+    "hours": 357,
+    "l_per_hr": 18.19,
+    "status": "Monitor",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "4cb6a17d-e409-4936-8a30-0e416e76ae9d",
+    "machine": "CMPG087",
+    "type": "ADT",
+    "litres": "6,342 L",
+    "hours": 363,
+    "l_per_hr": 17.47,
+    "status": "Normal",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "ccd48f8e-e672-4728-aa63-511870c37e74",
+    "machine": "CMPG102",
+    "type": "ADT",
+    "litres": "6,351 L",
+    "hours": 360,
+    "l_per_hr": 17.64,
+    "status": "Normal",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  }
+]

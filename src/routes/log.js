@@ -1,6 +1,5 @@
 import { Router } from "express";
 import { createLog, getLogData, removeLog, updateLog } from "../services/logService.js";
-import { resolveActor } from "../middleware/actor.js";
 
 export const logRouter = Router();
 
@@ -14,7 +13,7 @@ logRouter.get("/", async (_req, res, next) => {
 
 logRouter.post("/", async (req, res, next) => {
   try {
-    res.status(201).json(await createLog(req.body, resolveActor(req)));
+    res.status(201).json(await createLog(req.body, req.actor));
   } catch (err) {
     next(err);
   }
@@ -22,7 +21,7 @@ logRouter.post("/", async (req, res, next) => {
 
 logRouter.patch("/:id", async (req, res, next) => {
   try {
-    res.json(await updateLog(req.params.id, req.body, resolveActor(req)));
+    res.json(await updateLog(req.params.id, req.body, req.actor));
   } catch (err) {
     next(err);
   }
@@ -30,7 +29,7 @@ logRouter.patch("/:id", async (req, res, next) => {
 
 logRouter.delete("/:id", async (req, res, next) => {
   try {
-    res.json(await removeLog(req.params.id, resolveActor(req)));
+    res.json(await removeLog(req.params.id, req.actor));
   } catch (err) {
     next(err);
   }

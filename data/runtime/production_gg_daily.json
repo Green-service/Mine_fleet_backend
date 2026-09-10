@@ -1,0 +1,292 @@
+[
+  {
+    "id": "ee6db98a-9212-40e7-9b1b-f9c1815840f6",
+    "work_date": "03/01/2026",
+    "target": 15152,
+    "actual": 17593,
+    "variance": 2441,
+    "pct": 116.1,
+    "status": "Above Target",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "7b8483ac-eba9-4d47-83b9-5d1fca5dc4ab",
+    "work_date": "04/01/2026",
+    "target": 11972,
+    "actual": 13673,
+    "variance": 1701,
+    "pct": 114.2,
+    "status": "Above Target",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "2d3f9da2-0401-4c1b-a146-9e361143af52",
+    "work_date": "05/01/2026",
+    "target": 14234,
+    "actual": 13940,
+    "variance": -294,
+    "pct": 97.9,
+    "status": "Below Target",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "bb5d7e14-afa3-4f05-9aef-7a90cbfc88e9",
+    "work_date": "06/01/2026",
+    "target": 15755,
+    "actual": 16260,
+    "variance": 505,
+    "pct": 103.2,
+    "status": "Above Target",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "caff1fdc-0d54-4309-934c-f5a290b87976",
+    "work_date": "07/01/2026",
+    "target": 12683,
+    "actual": 17715,
+    "variance": 5032,
+    "pct": 139.7,
+    "status": "Above Target",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "e6a3a58f-e228-463b-bf7d-a08b09976f6d",
+    "work_date": "08/01/2026",
+    "target": 15275,
+    "actual": 18647,
+    "variance": 3372,
+    "pct": 122.1,
+    "status": "Above Target",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "248d1226-2f35-418b-89b8-23c1bb958cdc",
+    "work_date": "09/01/2026",
+    "target": 15275,
+    "actual": 17588,
+    "variance": 2313,
+    "pct": 115.1,
+    "status": "Above Target",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "3746f1b2-3c0e-424e-b525-8807dec9a437",
+    "work_date": "10/01/2026",
+    "target": 14975,
+    "actual": 16462,
+    "variance": 1487,
+    "pct": 109.9,
+    "status": "Above Target",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "ba574f52-0649-4371-9331-fc90b2bd1867",
+    "work_date": "11/01/2026",
+    "target": 15455,
+    "actual": 17584,
+    "variance": 2129,
+    "pct": 113.8,
+    "status": "Above Target",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "c2be00a3-cdc1-47f9-9e55-d6164acfc7d6",
+    "work_date": "12/01/2026",
+    "target": 15314,
+    "actual": 17051,
+    "variance": 1737,
+    "pct": 111.3,
+    "status": "Above Target",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "c6271127-37d4-4ccb-beb7-d513cc937c04",
+    "work_date": "13/01/2026",
+    "target": 15314,
+    "actual": 18320,
+    "variance": 3006,
+    "pct": 119.6,
+    "status": "Above Target",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "d8e68cfb-dd8c-463a-855d-c8d93257bc06",
+    "work_date": "14/01/2026",
+    "target": 15314,
+    "actual": 17122,
+    "variance": 1808,
+    "pct": 111.8,
+    "status": "Above Target",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "373844f2-d72f-4e87-b560-377e35482c29",
+    "work_date": "15/01/2026",
+    "target": 16754,
+    "actual": 17295,
+    "variance": 541,
+    "pct": 103.2,
+    "status": "Above Target",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "767288c8-d21b-4b3c-9714-f3e77935e515",
+    "work_date": "16/01/2026",
+    "target": 15314,
+    "actual": 17130,
+    "variance": 1816,
+    "pct": 111.9,
+    "status": "Above Target",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "dc66c13e-eb62-4152-a590-be3f40be9318",
+    "work_date": "17/01/2026",
+    "target": 14834,
+    "actual": 18381,
+    "variance": 3547,
+    "pct": 123.9,
+    "status": "Above Target",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "4e19fb2d-b825-4f92-b0b3-96bf8c3db107",
+    "work_date": "18/01/2026",
+    "target": 14834,
+    "actual": 18517,
+    "variance": 3683,
+    "pct": 124.8,
+    "status": "Above Target",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "62334cbd-6f6c-4462-8bae-b7509dce0367",
+    "work_date": "19/01/2026",
+    "target": 15794,
+    "actual": 16808,
+    "variance": 1014,
+    "pct": 106.4,
+    "status": "Above Target",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "6ca0d532-e95b-48b0-a405-4bf8f9687bdb",
+    "work_date": "20/01/2026",
+    "target": 15794,
+    "actual": 13463,
+    "variance": -2331,
+    "pct": 85.2,
+    "status": "Below Target",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "7ada9224-e042-4e23-9362-39f7d562c986",
+    "work_date": "21/01/2026",
+    "target": 14258,
+    "actual": 15566,
+    "variance": 1308,
+    "pct": 109.2,
+    "status": "Above Target",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "b4046e95-53ac-4a5e-a011-2eccc2bc39c5",
+    "work_date": "22/01/2026",
+    "target": 14906,
+    "actual": 11894,
+    "variance": -3012,
+    "pct": 79.8,
+    "status": "Below Target",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "3f156692-0537-4939-be8e-01cf2c116135",
+    "work_date": "23/01/2026",
+    "target": 15572,
+    "actual": 16927,
+    "variance": 1355,
+    "pct": 108.7,
+    "status": "Above Target",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "3e43168e-6621-4cb3-9ad7-9073cb6b9d10",
+    "work_date": "24/01/2026",
+    "target": 16052,
+    "actual": 17686,
+    "variance": 1634,
+    "pct": 110.2,
+    "status": "Above Target",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "61fc6c95-32cd-4af6-b57b-edfd388edf2d",
+    "work_date": "25/01/2026",
+    "target": 14426,
+    "actual": 16067,
+    "variance": 1641,
+    "pct": 111.4,
+    "status": "Above Target",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "97c2d7b4-c6d8-4077-928a-9dc00a0a8ce6",
+    "work_date": "26/01/2026",
+    "target": 15778,
+    "actual": 13546,
+    "variance": -2232,
+    "pct": 85.9,
+    "status": "Below Target",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "b2cc5701-099d-4604-a9e6-134efd254578",
+    "work_date": "27/01/2026",
+    "target": 15479,
+    "actual": 16349,
+    "variance": 870,
+    "pct": 105.6,
+    "status": "Above Target",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "6db3b584-6c80-41f0-a351-baca4fdf9a97",
+    "work_date": "28/01/2026",
+    "target": 14258,
+    "actual": 17262,
+    "variance": 3004,
+    "pct": 121.1,
+    "status": "Above Target",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "e8931201-3df7-4a42-a61a-25d163411924",
+    "work_date": "29/01/2026",
+    "target": 14258,
+    "actual": 13643,
+    "variance": -615,
+    "pct": 95.7,
+    "status": "Below Target",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "9953d8cc-234c-4c56-b753-2d8f666cd9c5",
+    "work_date": "30/01/2026",
+    "target": 15479,
+    "actual": 14381,
+    "variance": -1098,
+    "pct": 92.9,
+    "status": "Below Target",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "22598449-c24d-4c84-8c1e-25328f27b3c7",
+    "work_date": "31/01/2026",
+    "target": 15146,
+    "actual": 15305,
+    "variance": 159,
+    "pct": 101,
+    "status": "Above Target",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  }
+]

@@ -1,8 +1,10 @@
 import * as catalog from "../data/catalog.js";
+import * as ref from "../data/referenceCatalog.js";
 import { recordSystemEvent } from "./notifications.js";
 import { deleteRow, insertRow, readTable, updateRow } from "./store.js";
+import { makeCollection } from "./collectionService.js";
 
-const SITES = ["Grootegeluk", "Belfast", "Medupi", "Head Office"];
+const SITES = ["Grootegeluk", "Belfast", "Medupi"];
 const STATUSES = ["Operational", "Monitor", "Breakdown", "Maintenance", "Standby"];
 
 function num(value) {
@@ -147,3 +149,17 @@ export async function removeUnit(id, actor = null) {
   }
   return { ok: true };
 }
+
+// ---------------------------------------------------------------------------
+// Static/historical registers migrated off local component state
+// ---------------------------------------------------------------------------
+
+function summaryRow(row) {
+  return { id: row.id, type: row.type, qty: row.qty };
+}
+export const equipmentSummary = makeCollection("fleet_equipment_summary", ref.fleetEquipmentSummary, { toRow: summaryRow });
+
+function plantRegisterRow(row) {
+  return { id: row.id, category: row.category, units: row.units, make: row.make, area: row.area, qty: row.quantity };
+}
+export const plantRegister = makeCollection("fleet_classes", ref.fleetPlantRegister, { toRow: plantRegisterRow });

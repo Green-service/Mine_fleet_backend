@@ -1,1 +1,62 @@
-[]
+[
+  {
+    "id": "6c520e1c-0dcd-4250-b32f-1b038481649d",
+    "machine": "CMPG088",
+    "site": "Grootegeluk",
+    "litres": 2857,
+    "cost_per_litre": 31.65,
+    "hours": 138,
+    "status": "High Usage",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "18d5d046-3468-4cc7-a859-04633bc10f19",
+    "machine": "CMPG060",
+    "site": "Grootegeluk",
+    "litres": 2745,
+    "cost_per_litre": 31.65,
+    "hours": 140,
+    "status": "Normal",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "1278d0f2-e565-4b72-880d-7088bff2f8f7",
+    "machine": "CMPG044",
+    "site": "Grootegeluk",
+    "litres": 2640,
+    "cost_per_litre": 31.65,
+    "hours": 119,
+    "status": "Investigate",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "46882fa9-73c6-4301-8aa3-2a03173aa34a",
+    "machine": "CMPG022",
+    "site": "Grootegeluk",
+    "litres": 2428,
+    "cost_per_litre": 31.65,
+    "hours": 92,
+    "status": "Investigate",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "2ff789a8-3e36-44c5-ba48-c357dfd92071",
+    "machine": "CTP013",
+    "site": "Belfast",
+    "litres": 2079,
+    "cost_per_litre": 31.65,
+    "hours": 128,
+    "status": "Normal",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "2ae63cf4-d214-4232-9d36-908fa826a546",
+    "machine": "TT125",
+    "site": "Grootegeluk",
+    "litres": 1877,
+    "cost_per_litre": 31.65,
+    "hours": 134,
+    "status": "Efficient",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  }
+]

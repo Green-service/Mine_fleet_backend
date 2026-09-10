@@ -1,14 +1,28 @@
 import { Router } from "express";
-import { demoLogin, googleAuthorizeUrl, sessionFromGoogleToken } from "../services/auth.js";
+import { googleAuthorizeUrl, refreshSession, sessionFromGoogleToken, signInWithPassword } from "../services/auth.js";
 
 export const authRouter = Router();
 
-authRouter.post("/login", (req, res) => {
-  const email = String(req.body?.email || "").trim().toLowerCase();
-  const password = String(req.body?.password || "");
-  const session = demoLogin(email, password);
-  if (session) return res.json(session);
-  res.status(401).json({ error: "Invalid email or password" });
+authRouter.post("/login", async (req, res, next) => {
+  try {
+    const email = String(req.body?.email || "").trim().toLowerCase();
+    const password = String(req.body?.password || "");
+    if (!email || !password) {
+      res.status(400).json({ error: "Email and password are required." });
+      return;
+    }
+    res.json(await signInWithPassword(email, password));
+  } catch (err) {
+    next(err);
+  }
+});
+
+authRouter.post("/refresh", async (req, res, next) => {
+  try {
+    res.json(await refreshSession(req.body?.refreshToken));
+  } catch (err) {
+    next(err);
+  }
 });
 
 authRouter.get("/google", (_req, res, next) => {

@@ -2,9 +2,13 @@ import { Router } from "express";
 import { usingSupabase } from "../config/env.js";
 import { persistenceStatus } from "../services/store.js";
 import { storageStatus } from "../services/storageService.js";
-import { inviteUser, listHubUsers, publicInvite, refreshRoleUserCounts, revokeHubUser, updateHubUser } from "../services/inviteService.js";
-import { clockEmployee, getHrData } from "../services/hrService.js";
-import * as catalog from "../data/catalog.js";
+import { requireAuth } from "../middleware/requireAuth.js";
+import { requirePermission } from "../middleware/requirePermission.js";
+import {
+  createRole, inviteUser, listRoles, listUsers, removeRole, revokeUser, updateRole, updateUser,
+} from "../services/rolesService.js";
+import { ccma, clockEmployee, disciplinary, getHrData, increases, listManpowerTotals, manpower, promotions, recruitment } from "../services/hrService.js";
+import { mountCollection } from "./collectionRoutes.js";
 import { authRouter } from "./auth.js";
 import { productionRouter } from "./production.js";
 import { fleetRouter } from "./fleet.js";
@@ -21,6 +25,8 @@ import { assetsRouter } from "./assets.js";
 import { driversRouter } from "./drivers.js";
 import { logRouter } from "./log.js";
 import { documentsRouter } from "./documents.js";
+import { referenceRouter } from "./reference.js";
+import { dashboardRouter } from "./dashboard.js";
 import { listActivity, listNotifications, listSites } from "../services/inboxService.js";
 
 export const router = Router();
@@ -37,20 +43,23 @@ router.get("/health", (_req, res) => {
   });
 });
 
-router.get("/session", async (_req, res, next) => {
+router.use(requireAuth);
+
+router.get("/session", async (req, res, next) => {
   try {
     const [notifications, activity, sites] = await Promise.all([
       listNotifications(),
       listActivity(),
       listSites(),
     ]);
-    res.json({ user: catalog.sessionUser, sites, notifications, activity });
+    res.json({ user: req.actor, sites, notifications, activity });
   } catch (err) {
     next(err);
   }
 });
 
 router.use("/overview", overviewRouter);
+router.use("/dashboard", dashboardRouter);
 router.use("/businesses", businessesRouter);
 router.use("/assets", assetsRouter);
 router.use("/drivers", driversRouter);
@@ -66,89 +75,59 @@ router.use("/safety", safetyRouter);
 router.use("/procurement", procurementRouter);
 router.use("/finance", financeRouter);
 router.use("/settings", settingsRouter);
+router.use("/reference", referenceRouter);
 
 router.get("/hr", async (_req, res, next) => {
   try {
-    refreshRoleUserCounts();
-    res.json(
-      await getHrData({
-        roles: catalog.roles,
-        invites: catalog.invitedUsers.map(publicInvite),
-        users: listHubUsers(),
-      }),
-    );
+    const [roles, users] = await Promise.all([listRoles(), listUsers()]);
+    const invites = users.filter((u) => !u.locked);
+    res.json(await getHrData({ roles, invites, users }));
   } catch (err) {
     next(err);
   }
 });
 
-function nextRoleCode(roles) {
-  const used = roles
-    .map((role) => Number(String(role.code || "").replace(/^R/i, "")))
-    .filter((n) => Number.isFinite(n) && n > 0);
-  return `R${String((used.length ? Math.max(...used) : 0) + 1).padStart(3, "0")}`;
-}
-
-router.post("/hr/roles", (req, res) => {
-  const row = {
-    id: crypto.randomUUID(),
-    code: req.body.code || nextRoleCode(catalog.roles),
-    name: req.body.name,
-    slug: req.body.slug,
-    category: req.body.category || "Operations",
-    description: req.body.description,
-    users: 0,
-    modules: req.body.modules || 0,
-    status: req.body.status || "Active",
-    permissions: req.body.permissions || {},
-    employees: [],
-  };
-  catalog.roles.push(row);
-  res.status(201).json(row);
-});
-
-router.patch("/hr/roles/:id", (req, res) => {
-  const role = catalog.roles.find((item) => item.id === req.params.id);
-  if (!role) return res.status(404).json({ error: "Role not found" });
-  Object.assign(role, {
-    code: req.body.code ?? role.code,
-    name: req.body.name ?? role.name,
-    slug: req.body.slug ?? role.slug,
-    description: req.body.description ?? role.description,
-    status: req.body.status ?? role.status,
-    permissions: req.body.permissions ?? role.permissions,
-    modules: req.body.modules ?? role.modules,
-  });
-  res.json(role);
-});
-
-router.delete("/hr/roles/:id", (req, res) => {
-  const index = catalog.roles.findIndex((item) => item.id === req.params.id);
-  if (index < 0) return res.status(404).json({ error: "Role not found" });
-  if (catalog.roles[index].slug === "super-admin" || catalog.roles[index].slug === "driver") {
-    return res.status(400).json({ error: "Built-in roles cannot be removed." });
-  }
-  catalog.roles.splice(index, 1);
-  res.json({ ok: true });
-});
-
-router.patch("/hr/users/:id", (req, res, next) => {
+router.post("/hr/roles", requirePermission("hr", "create"), async (req, res, next) => {
   try {
-    res.json(updateHubUser(req.params.id, req.body || {}));
+    res.status(201).json(await createRole(req.body || {}));
   } catch (err) {
     next(err);
   }
 });
 
-router.delete("/hr/users/:id", (req, res, next) => {
+router.patch("/hr/roles/:id", requirePermission("hr", "edit"), async (req, res, next) => {
   try {
-    res.json(revokeHubUser(req.params.id));
+    res.json(await updateRole(req.params.id, req.body || {}));
   } catch (err) {
     next(err);
   }
 });
 
-router.post("/hr/invites", async (req, res, next) => {
+router.delete("/hr/roles/:id", requirePermission("hr", "delete"), async (req, res, next) => {
+  try {
+    res.json(await removeRole(req.params.id));
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.patch("/hr/users/:id", requirePermission("hr", "edit"), async (req, res, next) => {
+  try {
+    res.json(await updateUser(req.params.id, req.body || {}));
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.delete("/hr/users/:id", requirePermission("hr", "delete"), async (req, res, next) => {
+  try {
+    res.json(await revokeUser(req.params.id));
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.post("/hr/invites", requirePermission("hr", "create"), async (req, res, next) => {
   try {
     const row = await inviteUser({
       name: req.body.name,
@@ -169,6 +148,21 @@ router.post("/hr/clock", async (req, res, next) => {
     next(err);
   }
 });
+
+router.get("/hr/manpower-totals", async (_req, res, next) => {
+  try {
+    res.json(await listManpowerTotals());
+  } catch (err) {
+    next(err);
+  }
+});
+
+mountCollection(router, "/hr/manpower", manpower);
+mountCollection(router, "/hr/recruitment", recruitment);
+mountCollection(router, "/hr/increases", increases);
+mountCollection(router, "/hr/promotions", promotions);
+mountCollection(router, "/hr/disciplinary", disciplinary);
+mountCollection(router, "/hr/ccma", ccma);
 
 router.get("/reports", (_req, res) => {
   res.json({

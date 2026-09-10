@@ -1,1 +1,488 @@
-[]
+[
+  {
+    "id": "a3bf6c98-e1c1-42f7-bf1d-bbe949ae5547",
+    "fleet_no": "CMPG022",
+    "machine": "POWERSTAR WATERBOWER",
+    "status": "Maintenance",
+    "reason": "No issue reported",
+    "created_at": "2026-09-10T06:36:35.565323+00:00",
+    "action": "Monitor until return to service"
+  },
+  {
+    "id": "707e7e90-638e-4c16-8a27-96d5cbf10842",
+    "fleet_no": "CMPG057",
+    "machine": "POWERSTAR WATERBOWER",
+    "status": "Operational",
+    "reason": "No issue reported",
+    "created_at": "2026-09-10T06:36:35.565323+00:00",
+    "action": "Continue normal operation"
+  },
+  {
+    "id": "cde9750e-b586-421a-b3c6-d58789f90d81",
+    "fleet_no": "CMPG025",
+    "machine": "CAT TLB",
+    "status": "Operational",
+    "reason": "No issue reported",
+    "created_at": "2026-09-10T06:36:35.565323+00:00",
+    "action": "Continue normal operation"
+  },
+  {
+    "id": "f690176a-7246-4eba-9255-bc5e74d0ff26",
+    "fleet_no": "CMPG040",
+    "machine": "CAT MOTOR GRADER",
+    "status": "Operational",
+    "reason": "No issue reported",
+    "created_at": "2026-09-10T06:36:35.565323+00:00",
+    "action": "Continue normal operation"
+  },
+  {
+    "id": "d9bf0ea8-8fd8-4e01-b062-627bfcd7e34c",
+    "fleet_no": "CMPG044",
+    "machine": "CAT FEL",
+    "status": "Operational",
+    "reason": "No issue reported",
+    "created_at": "2026-09-10T06:36:35.565323+00:00",
+    "action": "Continue normal operation"
+  },
+  {
+    "id": "6aaa323e-522d-4143-8fe5-6505203b8975",
+    "fleet_no": "CMPG046",
+    "machine": "CAT FEL",
+    "status": "Operational",
+    "reason": "No issue reported",
+    "created_at": "2026-09-10T06:36:35.565323+00:00",
+    "action": "Continue normal operation"
+  },
+  {
+    "id": "d802f98a-d983-4fb1-9644-127e625987d1",
+    "fleet_no": "CMPG050",
+    "machine": "CAT FEL",
+    "status": "Operational",
+    "reason": "No issue reported",
+    "created_at": "2026-09-10T06:36:35.565323+00:00",
+    "action": "Continue normal operation"
+  },
+  {
+    "id": "f36b6899-4776-45b0-a322-5b8ee97eef56",
+    "fleet_no": "CMPG068",
+    "machine": "CAT FEL",
+    "status": "Operational",
+    "reason": "No issue reported",
+    "created_at": "2026-09-10T06:36:35.565323+00:00",
+    "action": "Continue normal operation"
+  },
+  {
+    "id": "f96fc9d3-9b45-4b28-abf2-812823f3f9ab",
+    "fleet_no": "CMPG077",
+    "machine": "VOLVO FEL",
+    "status": "Operational",
+    "reason": "No issue reported",
+    "created_at": "2026-09-10T06:36:35.565323+00:00",
+    "action": "Continue normal operation"
+  },
+  {
+    "id": "21bf3145-5df4-43b1-9655-ce8b5d1f9a3e",
+    "fleet_no": "CMPG054",
+    "machine": "BELL FINLAY SCREEN",
+    "status": "Operational",
+    "reason": "No issue reported",
+    "created_at": "2026-09-10T06:36:35.565323+00:00",
+    "action": "Continue normal operation"
+  },
+  {
+    "id": "269381b1-85ee-40f9-9c30-b567ada92084",
+    "fleet_no": "CMPG052",
+    "machine": "SCANIA BACKTIPPER",
+    "status": "Operational",
+    "reason": "No issue reported",
+    "created_at": "2026-09-10T06:36:35.565323+00:00",
+    "action": "Continue normal operation"
+  },
+  {
+    "id": "33fea0b4-463b-4da0-af5f-02505bd3098d",
+    "fleet_no": "CMPG053",
+    "machine": "SCANIA BACKTIPPER",
+    "status": "Operational",
+    "reason": "No issue reported",
+    "created_at": "2026-09-10T06:36:35.565323+00:00",
+    "action": "Continue normal operation"
+  },
+  {
+    "id": "4418748d-da58-4e5e-beef-177d395986eb",
+    "fleet_no": "CMPG055",
+    "machine": "SCANIA BACKTIPPER",
+    "status": "Breakdown",
+    "reason": "Propshaft broken.",
+    "created_at": "2026-09-10T06:36:35.565323+00:00",
+    "action": "Immediate engineering action"
+  },
+  {
+    "id": "979f22ef-f116-4843-b199-a8e8bc689cb6",
+    "fleet_no": "CMPG056",
+    "machine": "SCANIA BACKTIPPER",
+    "status": "Operational",
+    "reason": "No issue reported",
+    "created_at": "2026-09-10T06:36:35.565323+00:00",
+    "action": "Continue normal operation"
+  },
+  {
+    "id": "e58ba6d3-e9bb-44e6-be6c-c1d676b56715",
+    "fleet_no": "CMPG069",
+    "machine": "POWERSTAR BACKTIPPER",
+    "status": "Operational",
+    "reason": "No issue reported",
+    "created_at": "2026-09-10T06:36:35.565323+00:00",
+    "action": "Continue normal operation"
+  },
+  {
+    "id": "240444b3-8e22-4911-998e-63ea7eb04957",
+    "fleet_no": "CMPG070",
+    "machine": "POWERSTAR BACKTIPPER",
+    "status": "Maintenance",
+    "reason": "Wheel alignment at Hi-Q.",
+    "created_at": "2026-09-10T06:36:35.565323+00:00",
+    "action": "Monitor until return to service"
+  },
+  {
+    "id": "00818db9-973a-4561-89f0-d7c104ddf401",
+    "fleet_no": "CMPG047",
+    "machine": "MOBILIGHT LIGHTING TOWER",
+    "status": "Operational",
+    "reason": "No issue reported",
+    "created_at": "2026-09-10T06:36:35.565323+00:00",
+    "action": "Continue normal operation"
+  },
+  {
+    "id": "19431955-090c-4dc0-bc45-b4ae619c6e50",
+    "fleet_no": "CMPG048",
+    "machine": "MOBILIGHT LIGHTING TOWER",
+    "status": "Operational",
+    "reason": "No issue reported",
+    "created_at": "2026-09-10T06:36:35.565323+00:00",
+    "action": "Continue normal operation"
+  },
+  {
+    "id": "4c2e9f25-f332-4477-bcbf-f0308c8628ea",
+    "fleet_no": "CMPG049",
+    "machine": "MOBILIGHT LIGHTING TOWER",
+    "status": "Operational",
+    "reason": "No issue reported",
+    "created_at": "2026-09-10T06:36:35.565323+00:00",
+    "action": "Continue normal operation"
+  },
+  {
+    "id": "0668da98-a98b-420e-835a-c32dabcf4cd2",
+    "fleet_no": "CMPG051",
+    "machine": "MOBILIGHT LIGHTING TOWER",
+    "status": "Operational",
+    "reason": "No issue reported",
+    "created_at": "2026-09-10T06:36:35.565323+00:00",
+    "action": "Continue normal operation"
+  },
+  {
+    "id": "4fcef5dc-9b54-44dd-a89b-b2907b76c4d2",
+    "fleet_no": "CMPG058",
+    "machine": "MOBILIGHT LIGHTING TOWER",
+    "status": "Operational",
+    "reason": "No issue reported",
+    "created_at": "2026-09-10T06:36:35.565323+00:00",
+    "action": "Continue normal operation"
+  },
+  {
+    "id": "5c2b20be-3426-4beb-bf1f-17601fdb13ce",
+    "fleet_no": "CMPG059",
+    "machine": "MOBILIGHT LIGHTING TOWER",
+    "status": "Operational",
+    "reason": "No issue reported",
+    "created_at": "2026-09-10T06:36:35.565323+00:00",
+    "action": "Continue normal operation"
+  },
+  {
+    "id": "61590952-5a61-46f3-8b64-a899e536619a",
+    "fleet_no": "CMPG071",
+    "machine": "MOBILIGHT LIGHTING TOWER",
+    "status": "Operational",
+    "reason": "No issue reported",
+    "created_at": "2026-09-10T06:36:35.565323+00:00",
+    "action": "Continue normal operation"
+  },
+  {
+    "id": "264727fc-c06e-4aaa-9bf2-99b1723061ed",
+    "fleet_no": "CMPG072",
+    "machine": "MOBILIGHT LIGHTING TOWER",
+    "status": "Operational",
+    "reason": "No issue reported",
+    "created_at": "2026-09-10T06:36:35.565323+00:00",
+    "action": "Continue normal operation"
+  },
+  {
+    "id": "1c8ff817-1999-4e08-ac07-729938592cec",
+    "fleet_no": "CMPG023",
+    "machine": "BUNDU LIGHTING TOWER",
+    "status": "Operational",
+    "reason": "No issue reported",
+    "created_at": "2026-09-10T06:36:35.565323+00:00",
+    "action": "Continue normal operation"
+  },
+  {
+    "id": "a7466f3f-0638-41be-ac69-5935c921e988",
+    "fleet_no": "CMPG024",
+    "machine": "BUNDU LIGHTING TOWER",
+    "status": "Operational",
+    "reason": "No issue reported",
+    "created_at": "2026-09-10T06:36:35.565323+00:00",
+    "action": "Continue normal operation"
+  },
+  {
+    "id": "5f6ff847-49c6-4341-85a2-6948ad4749d0",
+    "fleet_no": "CMPG066",
+    "machine": "CAT ADT",
+    "status": "Operational",
+    "reason": "No issue reported",
+    "created_at": "2026-09-10T06:36:35.565323+00:00",
+    "action": "Continue normal operation"
+  },
+  {
+    "id": "9fcd135e-d1df-4e2f-912d-38d0f635af03",
+    "fleet_no": "CMPG067",
+    "machine": "CAT ADT",
+    "status": "Operational",
+    "reason": "No issue reported",
+    "created_at": "2026-09-10T06:36:35.565323+00:00",
+    "action": "Continue normal operation"
+  },
+  {
+    "id": "df4323e2-6f5a-4f99-a358-dadef31b650f",
+    "fleet_no": "CMPG060",
+    "machine": "CAT ADT",
+    "status": "Operational",
+    "reason": "No issue reported",
+    "created_at": "2026-09-10T06:36:35.565323+00:00",
+    "action": "Continue normal operation"
+  },
+  {
+    "id": "57755186-8d09-4af6-87f5-5efb52dd6081",
+    "fleet_no": "CMPG073",
+    "machine": "CAT ADT",
+    "status": "Breakdown",
+    "reason": "Motor and harness ready, awaiting an auto electrician.",
+    "created_at": "2026-09-10T06:36:35.565323+00:00",
+    "action": "Immediate engineering action"
+  },
+  {
+    "id": "88fca6a1-32b9-4dcb-8503-a9f7b80a1b63",
+    "fleet_no": "CMPG075",
+    "machine": "CAT ADT",
+    "status": "Breakdown",
+    "reason": "Taking time to change gears.",
+    "created_at": "2026-09-10T06:36:35.565323+00:00",
+    "action": "Immediate engineering action"
+  },
+  {
+    "id": "cedc9e45-1cb6-40b2-8d5c-ce74ac48db1f",
+    "fleet_no": "CMPG076",
+    "machine": "CAT ADT",
+    "status": "Operational",
+    "reason": "No issue reported",
+    "created_at": "2026-09-10T06:36:35.565323+00:00",
+    "action": "Continue normal operation"
+  },
+  {
+    "id": "509299fb-5010-4703-924b-08c48ed1d561",
+    "fleet_no": "CMPG079",
+    "machine": "CAT ADT",
+    "status": "Breakdown",
+    "reason": "Cylinder head ordered and will be fitted upon arrival.",
+    "created_at": "2026-09-10T06:36:35.565323+00:00",
+    "action": "Immediate engineering action"
+  },
+  {
+    "id": "b77bec49-1c72-4a4d-b31e-7274c1e9489f",
+    "fleet_no": "CMPG080",
+    "machine": "CAT ADT",
+    "status": "Operational",
+    "reason": "No issue reported",
+    "created_at": "2026-09-10T06:36:35.565323+00:00",
+    "action": "Continue normal operation"
+  },
+  {
+    "id": "4c9774f4-7dc5-47c2-a2bf-75f160d7248a",
+    "fleet_no": "CMPG003",
+    "machine": "SEM",
+    "status": "Operational",
+    "reason": "No issue reported",
+    "created_at": "2026-09-10T06:36:35.565323+00:00",
+    "action": "Continue normal operation"
+  },
+  {
+    "id": "927c06ad-5485-4a5c-9619-79364b77a04f",
+    "fleet_no": "CMPG004",
+    "machine": "CAT",
+    "status": "Maintenance",
+    "reason": "Service, bucket repair.",
+    "created_at": "2026-09-10T06:36:35.565323+00:00",
+    "action": "Monitor until return to service"
+  },
+  {
+    "id": "3e1da0d2-2bc4-4c9c-a43f-8f384d3a31f4",
+    "fleet_no": "CMPG009",
+    "machine": "CAT FEL",
+    "status": "Operational",
+    "reason": "No issue reported",
+    "created_at": "2026-09-10T06:36:35.565323+00:00",
+    "action": "Continue normal operation"
+  },
+  {
+    "id": "0e049ecf-6b36-4fa4-8f7a-036132293bc7",
+    "fleet_no": "CMPG014",
+    "machine": "CAT FEL",
+    "status": "Operational",
+    "reason": "No issue reported",
+    "created_at": "2026-09-10T06:36:35.565323+00:00",
+    "action": "Continue normal operation"
+  },
+  {
+    "id": "fb62d593-86ca-4330-bb84-be6b846f0a19",
+    "fleet_no": "CMPG006",
+    "machine": "POWERSTAR WATERBOWSER",
+    "status": "Operational",
+    "reason": "No issue reported",
+    "created_at": "2026-09-10T06:36:35.565323+00:00",
+    "action": "Continue normal operation"
+  },
+  {
+    "id": "d3ec7a2e-d0b2-4235-8a27-f7940f471ab7",
+    "fleet_no": "CMPG081",
+    "machine": "BD 86 MV ZN (New Bakkie)",
+    "status": "Operational",
+    "reason": "No issue reported",
+    "created_at": "2026-09-10T06:36:35.565323+00:00",
+    "action": "Continue normal operation"
+  },
+  {
+    "id": "cac95511-f362-4ab1-8e00-472be0f1cb89",
+    "fleet_no": "CMPG082",
+    "machine": "LX 77 JR GP (New Bakkie)",
+    "status": "Operational",
+    "reason": "No issue reported",
+    "created_at": "2026-09-10T06:36:35.565323+00:00",
+    "action": "Continue normal operation"
+  },
+  {
+    "id": "2ef07468-4d19-4e04-8094-1dc543879afa",
+    "fleet_no": "CMPG030",
+    "machine": "KYN266MP",
+    "status": "Operational",
+    "reason": "No issue reported",
+    "created_at": "2026-09-10T06:36:35.565323+00:00",
+    "action": "Continue normal operation"
+  },
+  {
+    "id": "6b6b4c99-57c3-42dc-8cc4-22025c9f2a5c",
+    "fleet_no": "CMPG031",
+    "machine": "KYN254MP",
+    "status": "Operational",
+    "reason": "No issue reported",
+    "created_at": "2026-09-10T06:36:35.565323+00:00",
+    "action": "Continue normal operation"
+  },
+  {
+    "id": "1b561ccc-3944-4193-b0ce-f9d5edb4362e",
+    "fleet_no": "CMPG045",
+    "machine": "KYK516MP",
+    "status": "Operational",
+    "reason": "No issue reported",
+    "created_at": "2026-09-10T06:36:35.565323+00:00",
+    "action": "Continue normal operation"
+  },
+  {
+    "id": "bb4b3373-fa95-42bc-9871-930c491a1cd2",
+    "fleet_no": "NISSAN NP200",
+    "machine": "KZW950MP",
+    "status": "Maintenance",
+    "reason": "Service at Nissan.",
+    "created_at": "2026-09-10T06:36:35.565323+00:00",
+    "action": "Monitor until return to service"
+  },
+  {
+    "id": "6b5f7d11-6c32-480c-b98b-5ecf75faa563",
+    "fleet_no": "NISSAN NP200",
+    "machine": "KZW959MP",
+    "status": "Operational",
+    "reason": "No issue reported",
+    "created_at": "2026-09-10T06:36:35.565323+00:00",
+    "action": "Continue normal operation"
+  },
+  {
+    "id": "c58a4a86-dbf7-4998-aab1-df32fd9e461e",
+    "fleet_no": "CMPG012",
+    "machine": "LGW644MP",
+    "status": "Operational",
+    "reason": "No issue reported",
+    "created_at": "2026-09-10T06:36:35.565323+00:00",
+    "action": "Continue normal operation"
+  },
+  {
+    "id": "dd476824-bb5e-4744-b637-9c34a8d53753",
+    "fleet_no": "CMPG013",
+    "machine": "KRM535MP",
+    "status": "Operational",
+    "reason": "No issue reported",
+    "created_at": "2026-09-10T06:36:35.565323+00:00",
+    "action": "Continue normal operation"
+  },
+  {
+    "id": "ce18a028-6b43-4c96-bd25-1cd0d74f5c2c",
+    "fleet_no": "FORD RANGER",
+    "machine": "KTK875MP",
+    "status": "Operational",
+    "reason": "No issue reported",
+    "created_at": "2026-09-10T06:36:35.565323+00:00",
+    "action": "Continue normal operation"
+  },
+  {
+    "id": "f91e5b7c-1964-4867-b95c-045d09ba3629",
+    "fleet_no": "CMPG005",
+    "machine": "KNH268MP",
+    "status": "Operational",
+    "reason": "No issue reported",
+    "created_at": "2026-09-10T06:36:35.565323+00:00",
+    "action": "Continue normal operation"
+  },
+  {
+    "id": "e75c3152-e37f-4991-8af3-3e8edbeeb581",
+    "fleet_no": "CMPG007",
+    "machine": "KRK521MP",
+    "status": "Operational",
+    "reason": "No issue reported",
+    "created_at": "2026-09-10T06:36:35.565323+00:00",
+    "action": "Continue normal operation"
+  },
+  {
+    "id": "7e1d2e46-5725-4761-8ed8-9f8c73110761",
+    "fleet_no": "CMPG010",
+    "machine": "KSB848MP",
+    "status": "Operational",
+    "reason": "No issue reported",
+    "created_at": "2026-09-10T06:36:35.565323+00:00",
+    "action": "Continue normal operation"
+  },
+  {
+    "id": "ea5b9c96-802e-47d9-9418-8297dc7dc80f",
+    "fleet_no": "CMPG078",
+    "machine": "LH73YBGP",
+    "status": "Operational",
+    "reason": "No issue reported",
+    "created_at": "2026-09-10T06:36:35.565323+00:00",
+    "action": "Continue normal operation"
+  },
+  {
+    "id": "5842bebe-fa30-4c32-8eb7-ca8b1bec0d2e",
+    "fleet_no": "TOYOTA HILUX",
+    "machine": "KYN262MP",
+    "status": "Operational",
+    "reason": "No issue reported",
+    "created_at": "2026-09-10T06:36:35.565323+00:00",
+    "action": "Continue normal operation"
+  }
+]

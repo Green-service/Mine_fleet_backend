@@ -1,5 +1,7 @@
 import * as catalog from "../data/catalog.js";
+import * as ref from "../data/referenceCatalog.js";
 import { readTable } from "./store.js";
+import { makeCollection, optStr, str } from "./collectionService.js";
 
 function num(value) {
   const n = Number(value ?? 0);
@@ -54,3 +56,28 @@ export async function getFinance() {
       : "Capture machine costs to populate the monthly register.",
   };
 }
+
+// ---------------------------------------------------------------------------
+// Static/historical registers migrated off local component state
+// ---------------------------------------------------------------------------
+
+function costActionRow(row) {
+  return { id: row.id, action: row.action, owner: row.owner, priority: row.priority, due: row.due_label, status: row.status, evidence: row.evidence };
+}
+function costActionPayload(input, previous = {}) {
+  const action = str(input.action, previous.action);
+  const owner = str(input.owner, previous.owner);
+  if (!action || !owner) {
+    const err = new Error("Enter an action and owner.");
+    err.status = 400;
+    throw err;
+  }
+  return {
+    action, owner,
+    priority: optStr(input.priority, previous.priority) || "Medium",
+    due_label: optStr(input.due, previous.due),
+    status: optStr(input.status, previous.status) || "Open",
+    evidence: optStr(input.evidence, previous.evidence),
+  };
+}
+export const costActions = makeCollection("finance_cost_actions", ref.financeCostActions, { toRow: costActionRow, toPayload: costActionPayload });

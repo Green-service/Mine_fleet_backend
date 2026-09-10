@@ -33,6 +33,9 @@ export const businesses = [];
 export const businessNames = [];
 export const defaultBusinessName = "";
 
+export const siteNames = ["Grootegeluk", "Belfast", "Medupi"];
+export const defaultSiteName = "Grootegeluk";
+
 export const businessTransactions = [];
 export const businessMonthlyTrend = [];
 

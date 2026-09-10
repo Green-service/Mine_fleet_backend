@@ -1,0 +1,80 @@
+[
+  {
+    "id": "21de48e2-7d99-459b-9cbb-73011724f1ea",
+    "week": "WEEK 1 TOTAL",
+    "product_loading": 15017.7,
+    "sscc": 20736,
+    "pci": 1440,
+    "sn_ss2": 1536,
+    "psc_bf": 5760,
+    "buffalo_feeder": 5000,
+    "screening": 960,
+    "total": 50449.7,
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "8e57f51e-5dbd-4d60-aa62-ca06e8d99b58",
+    "week": "WEEK 2 TOTAL",
+    "product_loading": 35041.3,
+    "sscc": 36288,
+    "pci": 1440,
+    "sn_ss2": 3072,
+    "psc_bf": 11520,
+    "buffalo_feeder": 15000,
+    "screening": 1440,
+    "total": 104761.3,
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "a4db577a-295f-4061-9b66-e91c53b939cc",
+    "week": "WEEK 3 TOTAL",
+    "product_loading": 35041.3,
+    "sscc": 36288,
+    "pci": 1440,
+    "sn_ss2": 1536,
+    "psc_bf": 11520,
+    "buffalo_feeder": 15000,
+    "screening": 2400,
+    "total": 88993.3,
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "ae89aaed-9095-4f58-b0a3-86d19724fc18",
+    "week": "WEEK 4 TOTAL",
+    "product_loading": 35041.3,
+    "sscc": 36288,
+    "pci": 0,
+    "sn_ss2": 1536,
+    "psc_bf": 11520,
+    "buffalo_feeder": 10000,
+    "screening": 2400,
+    "total": 98225.3,
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "121b176d-8bb6-41be-b79c-6d8d50c32012",
+    "week": "WEEK 5 TOTAL",
+    "product_loading": 30035.4,
+    "sscc": 31104,
+    "pci": 1440,
+    "sn_ss2": 1536,
+    "psc_bf": 11520,
+    "buffalo_feeder": 5000,
+    "screening": 2400,
+    "total": 81115.4,
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "24a822b5-00be-4d2c-9100-3b59de26736c",
+    "week": "Forecast Total",
+    "product_loading": 150177,
+    "sscc": 160704,
+    "pci": 5760,
+    "sn_ss2": 9216,
+    "psc_bf": 51840,
+    "buffalo_feeder": 50000,
+    "screening": 9600,
+    "total": 423545,
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  }
+]

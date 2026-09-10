@@ -1,0 +1,110 @@
+[
+  {
+    "id": "10a8ea8a-5894-4a53-82c4-41479b2b0077",
+    "category": "Articulated Dump Trucks",
+    "quantity": 20,
+    "units": "CMPG060, 066, 067, 080, 086–098, 101, 102, 104 and TT124",
+    "make": "CAT 730C/740GC and Volvo A40G",
+    "area": "GGC and Eskom Medupi",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "e35c4e43-1fff-412b-9a6c-ed63edaf93b3",
+    "category": "Back Tippers",
+    "quantity": 6,
+    "units": "CMPG052, 053, 055, 056, 069 and 070",
+    "make": "Scania G460/P410 and Powerstar 2628",
+    "area": "GGC",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "157b417d-fc6e-4d47-94c4-1b84a87682cf",
+    "category": "Rigid Dump Trucks",
+    "quantity": 3,
+    "units": "CGHM055, CGHM056 and CGHM059",
+    "make": "SANY SKT90",
+    "area": "Eskom Medupi",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "2fc53c44-07a5-4511-aa04-70c76dadbbb7",
+    "category": "Front-End Loaders",
+    "quantity": 11,
+    "units": "CMPG004, 009, 014, 044, 046, 050, 068, 077, CTP013, CTP014 and CTP023",
+    "make": "CAT 966/950, Volvo L150H and SANY 956",
+    "area": "Belfast, GGC and Eskom Medupi",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "4154f03c-f158-4d72-979e-518b474fb3e7",
+    "category": "TLB",
+    "quantity": 1,
+    "units": "CMPG025",
+    "make": "CAT 426",
+    "area": "GGC",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "5b80fb42-a20a-474d-b235-4b936f865d38",
+    "category": "Compactor",
+    "quantity": 1,
+    "units": "CMPG085",
+    "make": "CAT CS12",
+    "area": "GGC",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "34351b04-c83f-44bf-ba5d-858f24b014d8",
+    "category": "Grader",
+    "quantity": 1,
+    "units": "CMPG040",
+    "make": "CAT 140K",
+    "area": "GGC",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "e4ae699b-7810-4066-96bf-897045d6d3d7",
+    "category": "Water Trucks",
+    "quantity": 4,
+    "units": "CMPG006, CMPG022, CMPG057 and TT103",
+    "make": "Powerstar 2628 and Volvo A40G",
+    "area": "Belfast and GGC",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "d12d417c-3053-4d9c-ad05-5d620ea9ef90",
+    "category": "Diesel Trailers",
+    "quantity": 2,
+    "units": "CMPG065 and CMPG100",
+    "make": "1,000L and 3,000L bowsers",
+    "area": "GGC",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "42e88e1d-341b-4380-b3ac-ecaa08727e08",
+    "category": "Lighting Plants",
+    "quantity": 10,
+    "units": "CMPG023, 024, 047–049, 051, 058, 059, 071 and 072",
+    "make": "Industrial Group and Italtower/Pilot Crusher",
+    "area": "GGC",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "8fc64224-dc9f-453e-be23-c4c8ef29255a",
+    "category": "Mobile Screen",
+    "quantity": 1,
+    "units": "CMPG054",
+    "make": "Bell Finlay",
+    "area": "GGC",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "e57b506e-58c0-46c3-a096-8b4eb47d65f1",
+    "category": "LDVs",
+    "quantity": 17,
+    "units": "Various MPG fleet and registration numbers",
+    "make": "Toyota Hilux, Nissan NP200, Isuzu D-Max and Ford Ranger",
+    "area": "GGC, Belfast and Head Office",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  }
+]

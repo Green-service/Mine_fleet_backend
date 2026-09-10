@@ -7,7 +7,6 @@ import {
   updateBusiness,
 } from "../services/businessesService.js";
 
-import { resolveActor } from "../middleware/actor.js";
 
 export const businessesRouter = Router();
 
@@ -29,7 +28,7 @@ businessesRouter.get("/", async (_req, res, next) => {
 
 businessesRouter.post("/", async (req, res, next) => {
   try {
-    res.status(201).json(await createBusiness(req.body || {}, resolveActor(req)));
+    res.status(201).json(await createBusiness(req.body || {}, req.actor));
   } catch (err) {
     next(err);
   }
@@ -37,7 +36,7 @@ businessesRouter.post("/", async (req, res, next) => {
 
 businessesRouter.patch("/:id", async (req, res, next) => {
   try {
-    res.json(await updateBusiness(req.params.id, req.body || {}, resolveActor(req)));
+    res.json(await updateBusiness(req.params.id, req.body || {}, req.actor));
   } catch (err) {
     next(err);
   }
@@ -45,7 +44,7 @@ businessesRouter.patch("/:id", async (req, res, next) => {
 
 businessesRouter.delete("/:id", async (req, res, next) => {
   try {
-    res.json(await removeBusiness(req.params.id, resolveActor(req)));
+    res.json(await removeBusiness(req.params.id, req.actor));
   } catch (err) {
     next(err);
   }

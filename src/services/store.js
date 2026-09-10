@@ -25,6 +25,17 @@ function applyLocal(table, rows, fallbackList) {
   return rows;
 }
 
+function ensureIds(table, rows, fallbackList) {
+  let changed = false;
+  const withIds = rows.map((row) => {
+    if (row.id) return row;
+    changed = true;
+    return { id: crypto.randomUUID(), ...row };
+  });
+  if (changed) applyLocal(table, withIds, fallbackList);
+  return withIds;
+}
+
 const ORDER_COLUMN = {
   app_settings: "updated_at",
 };
@@ -33,7 +44,8 @@ export async function readTable(table, fallback) {
   const local = localRows(table, fallback);
 
   if (!supabase) {
-    return local.length ? local : fallback;
+    const rows = local.length ? local : fallback;
+    return ensureIds(table, rows, fallback);
   }
 
   const orderBy = ORDER_COLUMN[table] || "created_at";

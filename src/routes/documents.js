@@ -1,7 +1,6 @@
 import { Router } from "express";
 import { createDocument, getDocuments, removeDocument } from "../services/documentsService.js";
 
-import { resolveActor } from "../middleware/actor.js";
 
 export const documentsRouter = Router();
 
@@ -15,7 +14,7 @@ documentsRouter.get("/", async (_req, res, next) => {
 
 documentsRouter.post("/", async (req, res, next) => {
   try {
-    res.status(201).json(await createDocument(req.body || {}, resolveActor(req)));
+    res.status(201).json(await createDocument(req.body || {}, req.actor));
   } catch (err) {
     next(err);
   }
@@ -23,7 +22,7 @@ documentsRouter.post("/", async (req, res, next) => {
 
 documentsRouter.delete("/:id", async (req, res, next) => {
   try {
-    res.json(await removeDocument(req.params.id, resolveActor(req)));
+    res.json(await removeDocument(req.params.id, req.actor));
   } catch (err) {
     next(err);
   }

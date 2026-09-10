@@ -1,0 +1,443 @@
+[
+  {
+    "id": "fa4cd768-4602-4111-a479-73c9ca41ec5a",
+    "page": "production",
+    "group_key": "rules",
+    "term": "GG Target",
+    "description": "Sum of production Targets where “Target counted” is Yes.",
+    "sort_order": 0,
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "3866c55b-5111-4b25-906a-675788b2f8bc",
+    "page": "production",
+    "group_key": "rules",
+    "term": "GG Actual Tonnage",
+    "description": "Sum of recorded Actual tons for GG.",
+    "sort_order": 1,
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "723a3e91-8969-4273-8116-dcb7271538d0",
+    "page": "production",
+    "group_key": "rules",
+    "term": "Daily Variance",
+    "description": "Actual Tonnage minus Daily Target.",
+    "sort_order": 2,
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "f9c94d7d-c908-4c6e-9ef8-651f243a487e",
+    "page": "production",
+    "group_key": "rules",
+    "term": "Achievement %",
+    "description": "Actual Tonnage divided by Target.",
+    "sort_order": 3,
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "5fffdff7-8ef6-4e9c-8bed-970a8d634476",
+    "page": "production",
+    "group_key": "rules",
+    "term": "Weekly Actual Tonnage",
+    "description": "Sum of daily Actual tons within each January week for the requested product category.",
+    "sort_order": 4,
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "1e39a3b4-70c1-4101-8bdd-d54e8ff4c855",
+    "page": "diesel",
+    "group_key": "workflow",
+    "term": "Step 1",
+    "description": "Capture supplier receipts from Sasol and Mass Petroleum.",
+    "sort_order": 0,
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "a516329e-7caa-48c0-afd6-26611294ccca",
+    "page": "diesel",
+    "group_key": "workflow",
+    "term": "Step 2",
+    "description": "Capture pump issues to TMMs and transfers to bowsers.",
+    "sort_order": 1,
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "c6e07122-db23-4227-8dda-20b672467e50",
+    "page": "diesel",
+    "group_key": "workflow",
+    "term": "Step 3",
+    "description": "Capture bowser issues to individual equipment.",
+    "sort_order": 2,
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "74000332-1bd6-438d-a00c-abdc5e778206",
+    "page": "diesel",
+    "group_key": "workflow",
+    "term": "Step 4",
+    "description": "Compare calculated closing stock with physical closing stock.",
+    "sort_order": 3,
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "0e6edfe9-d5a1-4f10-bcdd-12ff01c57303",
+    "page": "diesel",
+    "group_key": "workflow",
+    "term": "Step 5",
+    "description": "Flag daily variances and differences between issued litres and TMM consumption.",
+    "sort_order": 4,
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "40ea8992-d58f-4da5-b2f9-ccb3bdac4a38",
+    "page": "diesel",
+    "group_key": "workflow",
+    "term": "Step 6",
+    "description": "Require investigation comments and management approval before month-end close.",
+    "sort_order": 5,
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "8574ca94-b4c7-457c-a433-6f52a78f4ba8",
+    "page": "diesel",
+    "group_key": "rules",
+    "term": "Total Diesel Cost",
+    "description": "Litres issued multiplied by the applicable cost per litre.",
+    "sort_order": 0,
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "eefb4feb-87bc-4b5a-8b42-4f68ba795526",
+    "page": "diesel",
+    "group_key": "rules",
+    "term": "Litres per Operating Hour",
+    "description": "Litres issued divided by hours worked.",
+    "sort_order": 1,
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "c3a3e347-3d4c-43d4-8ec1-7f83288af90f",
+    "page": "diesel",
+    "group_key": "rules",
+    "term": "Fuel Cost per Operating Hour",
+    "description": "Total diesel cost divided by hours worked.",
+    "sort_order": 2,
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "7ca31d96-cdc4-495b-a500-1978c2fb1aba",
+    "page": "diesel",
+    "group_key": "rules",
+    "term": "Fuel per Tonne",
+    "description": "Total litres used divided by tonnes produced.",
+    "sort_order": 3,
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "05160c94-1cf3-4e4d-9d54-c02a6f2fc496",
+    "page": "diesel",
+    "group_key": "rules",
+    "term": "Exception Controls",
+    "description": "High consumption, duplicate entries, missing meter readings, fuel issued to equipment on breakdown and unusual increases.",
+    "sort_order": 4,
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "b2c983e7-af8b-4e43-bc5b-c91384bba0c4",
+    "page": "maintenance",
+    "group_key": "status-workflow",
+    "term": "Operational",
+    "description": "Machine is available for normal use. Continue inspections and preventive maintenance.",
+    "sort_order": 0,
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "e840f243-1786-4a62-aa2e-b43762a3390b",
+    "page": "maintenance",
+    "group_key": "status-workflow",
+    "term": "Maintenance / Off-site",
+    "description": "Machine is undergoing service, repair, alignment or work at an external supplier. Record ETA and responsible person.",
+    "sort_order": 1,
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "7524f2ca-b43f-4906-a633-46546e8e6d76",
+    "page": "maintenance",
+    "group_key": "status-workflow",
+    "term": "Breakdown",
+    "description": "Machine is unavailable because of a fault. Create or link a breakdown report, work order, parts requirement and return-to-service date.",
+    "sort_order": 2,
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "f04b830b-fa30-4a78-8fec-d4b273756d67",
+    "page": "maintenance",
+    "group_key": "status-workflow",
+    "term": "Status Update Control",
+    "description": "Only authorised maintenance or site-management users should change machine status. Every change must retain date, time, user and reason.",
+    "sort_order": 3,
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "862f97a1-a05b-49dc-ae70-a73dc31dd865",
+    "page": "maintenance",
+    "group_key": "maintenance-workflow",
+    "term": "1. Hour Update",
+    "description": "Capture each machine's current operating hours daily.",
+    "sort_order": 0,
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "a1e84379-940b-4e1b-8764-b26e007e769e",
+    "page": "maintenance",
+    "group_key": "maintenance-workflow",
+    "term": "2. Service Calculation",
+    "description": "Calculate hours remaining from next service hours minus current hours.",
+    "sort_order": 1,
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "06190099-55e5-4189-b1e3-050b63f79549",
+    "page": "maintenance",
+    "group_key": "maintenance-workflow",
+    "term": "3. Planning Alert",
+    "description": "Issue alerts at 200, 100 and 50 hours remaining, and flag overdue services immediately.",
+    "sort_order": 2,
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "cfd3fdd2-dd55-4ad0-a767-1db9bbd40e05",
+    "page": "maintenance",
+    "group_key": "maintenance-workflow",
+    "term": "4. Resource Check",
+    "description": "Confirm service kits, spares, technician availability, supplier support and purchase-order status.",
+    "sort_order": 3,
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "e127b742-e211-4d74-a4e6-1919b29529b2",
+    "page": "maintenance",
+    "group_key": "maintenance-workflow",
+    "term": "5. Production Coordination",
+    "description": "Agree the service date with Production and record any postponement reason.",
+    "sort_order": 4,
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "c980d2b9-3589-41db-a3c3-5d0838b0175a",
+    "page": "maintenance",
+    "group_key": "maintenance-workflow",
+    "term": "6. Work Order",
+    "description": "Create a work order and digital job card for the planned activity.",
+    "sort_order": 5,
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "cffcab91-da9a-406c-bf8b-585c607729f4",
+    "page": "maintenance",
+    "group_key": "maintenance-workflow",
+    "term": "7. Completion",
+    "description": "Record actual hours, parts used, findings, testing and supervisor verification.",
+    "sort_order": 6,
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "8a0e2ad2-5c50-46d6-81bb-41fc3b9e06c1",
+    "page": "maintenance",
+    "group_key": "maintenance-workflow",
+    "term": "8. Reset Plan",
+    "description": "Update previous service hours and automatically calculate the next service interval.",
+    "sort_order": 7,
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "aad4486d-2181-4cdd-b9d7-2fd19824e158",
+    "page": "breakdowns",
+    "group_key": "inventory-workflow",
+    "term": "1. Breakdown Diagnosis",
+    "description": "Technician identifies the failed component and required part.",
+    "sort_order": 0,
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "911164bb-ff6c-4965-ad74-191a94ed1c25",
+    "page": "breakdowns",
+    "group_key": "inventory-workflow",
+    "term": "2. Inventory Check",
+    "description": "System checks GG, BLF and general-stock registers for the required item.",
+    "sort_order": 1,
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "d8b99fd7-04b4-4001-91c0-ca84fe0b1299",
+    "page": "breakdowns",
+    "group_key": "inventory-workflow",
+    "term": "3. Reserve Stock",
+    "description": "Available stock is reserved against the breakdown number and work order.",
+    "sort_order": 2,
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "7a5612e7-e7c0-4c3c-8017-6c30d8ca8b73",
+    "page": "breakdowns",
+    "group_key": "inventory-workflow",
+    "term": "4. Issue Stock",
+    "description": "Stores records quantity issued, technician, machine and date/time.",
+    "sort_order": 3,
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "95c5479d-a86d-46d4-8173-f4d42d140979",
+    "page": "breakdowns",
+    "group_key": "inventory-workflow",
+    "term": "5. Procurement Trigger",
+    "description": "If stock is unavailable or below minimum, create a purchase request automatically.",
+    "sort_order": 4,
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "5dbc6d27-dffa-4979-a30e-3e397005f9bb",
+    "page": "breakdowns",
+    "group_key": "inventory-workflow",
+    "term": "6. Reorder Control",
+    "description": "Critical items and low-stock items remain visible until replenished.",
+    "sort_order": 5,
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "8e6aaf70-0cf0-49c0-bd51-7fcdbc3beb02",
+    "page": "breakdowns",
+    "group_key": "availability-terms",
+    "term": "Above Target",
+    "description": "Availability is equal to or above the 85% target.",
+    "sort_order": 0,
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "7be223ef-bd68-4e64-bffe-42e24cb1ed7a",
+    "page": "breakdowns",
+    "group_key": "availability-terms",
+    "term": "Below Target",
+    "description": "Availability is below 85% but remains at or above 70%; management attention is required.",
+    "sort_order": 1,
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "662425ce-1418-4b4f-93c9-78a80d2993d5",
+    "page": "breakdowns",
+    "group_key": "availability-terms",
+    "term": "Critical",
+    "description": "Availability is below 70%; corrective action, repair planning and escalation are required.",
+    "sort_order": 2,
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "cf5742b0-3875-4003-8cc0-5ca3071f93ea",
+    "page": "breakdowns",
+    "group_key": "availability-terms",
+    "term": "Utilisation",
+    "description": "Shows how much of the available machine time was used productively.",
+    "sort_order": 3,
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "fb85e01b-7380-421b-bc0d-c1300a8d85ab",
+    "page": "breakdowns",
+    "group_key": "availability-terms",
+    "term": "MTTF",
+    "description": "Mean time to failure, calculated from hours worked and recorded failures where applicable.",
+    "sort_order": 4,
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "2996d5aa-edb9-4527-8a8c-f6f78c6577d8",
+    "page": "hr",
+    "group_key": "timesheet-rules",
+    "term": "Hours Worked",
+    "description": "Clock-out minus clock-in, less unpaid breaks.",
+    "sort_order": 0,
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "6088bc88-989e-4ee7-b4c2-d3546b9e62fe",
+    "page": "hr",
+    "group_key": "timesheet-rules",
+    "term": "Normal Pay",
+    "description": "Approved normal hours multiplied by the employee normal hourly rate.",
+    "sort_order": 1,
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "0cc7b4f7-242c-4c02-b915-833bcabc539c",
+    "page": "hr",
+    "group_key": "timesheet-rules",
+    "term": "Overtime Pay",
+    "description": "Approved overtime hours multiplied by the configured overtime rate.",
+    "sort_order": 2,
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "dccfbcfc-2f0e-451e-b815-69b048258ff3",
+    "page": "hr",
+    "group_key": "timesheet-rules",
+    "term": "Exceptions",
+    "description": "Late arrival, early departure, missing clock-in, missing clock-out, duplicate clocking and excessive hours.",
+    "sort_order": 3,
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "ca190ac0-723f-4ab9-985e-5b198c618fd5",
+    "page": "hr",
+    "group_key": "timesheet-rules",
+    "term": "Approval",
+    "description": "Supervisors review exceptions and approve timesheets before payroll export.",
+    "sort_order": 4,
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "e6906934-b3b6-4bea-9bc3-85048c9b4f81",
+    "page": "hr",
+    "group_key": "hr-workflow",
+    "term": "Manpower Control",
+    "description": "Compare budgeted headcount to actual headcount by site and job title and flag vacancies automatically.",
+    "sort_order": 0,
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "b61dd9d9-f429-4c8b-bf0c-92301347bd29",
+    "page": "hr",
+    "group_key": "hr-workflow",
+    "term": "Recruitment",
+    "description": "Track advert, shortlist, interview, offer, appointment and medical readiness for every position.",
+    "sort_order": 1,
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "0b260861-a8a8-4025-9531-e595e5f877f7",
+    "page": "hr",
+    "group_key": "hr-workflow",
+    "term": "Employee Readiness",
+    "description": "Link medical validity, training, clocking and site allocation to the employee profile.",
+    "sort_order": 2,
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "64a84bc0-b3ee-4d4a-871f-17d6b59b40e7",
+    "page": "hr",
+    "group_key": "hr-workflow",
+    "term": "Salary Increase",
+    "description": "Record effective date, increase percentage, reason, approver and audit trail.",
+    "sort_order": 3,
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "87ab9a62-4fcc-4364-81f2-045f8108ad83",
+    "page": "hr",
+    "group_key": "hr-workflow",
+    "term": "Promotion",
+    "description": "Record old and new job titles, effective date, increase percentage and approval.",
+    "sort_order": 4,
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  }
+]

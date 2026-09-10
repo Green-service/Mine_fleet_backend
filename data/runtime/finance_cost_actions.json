@@ -1,0 +1,82 @@
+[
+  {
+    "id": "70b593a2-b842-41fa-9bf3-5d53fcd7da34",
+    "action": "Review monthly supplier spend and investigate unusual cost increases",
+    "owner": "Finance / Procurement",
+    "priority": "High",
+    "due_label": "This month",
+    "status": "In Progress",
+    "evidence": "Supplier spend review and variance explanation",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "91e4beea-3df4-42f6-bf40-1d3a7b5b32a2",
+    "action": "Confirm all machine-related invoices carry the correct machine number",
+    "owner": "Finance / Workshop",
+    "priority": "High",
+    "due_label": "Ongoing",
+    "status": "In Progress",
+    "evidence": "Machine cost allocation register",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "49b3e660-2f74-4927-b397-1d4cf754528d",
+    "action": "Reconcile diesel cost to litres issued and machine usage",
+    "owner": "Finance / Diesel Controller",
+    "priority": "High",
+    "due_label": "Weekly",
+    "status": "Open",
+    "evidence": "Signed diesel reconciliation",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "3ae9fad6-3258-47ad-8d9b-e847f0f7f3ab",
+    "action": "Review open POs and follow up long-outstanding orders",
+    "owner": "Procurement",
+    "priority": "Medium",
+    "due_label": "Weekly",
+    "status": "Open",
+    "evidence": "Updated open PO report",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "aa56f741-ffc0-473d-8c63-05c6ef61ceeb",
+    "action": "Match supplier statements to invoices, credits and payments",
+    "owner": "Finance",
+    "priority": "Medium",
+    "due_label": "Month-end",
+    "status": "Open",
+    "evidence": "Supplier reconciliation signed off",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "72c398d6-a941-4219-b28c-3bec9b411ea5",
+    "action": "Validate cost classification before month-end reporting",
+    "owner": "Finance Manager",
+    "priority": "Medium",
+    "due_label": "Month-end",
+    "status": "Completed",
+    "evidence": "Reviewed cost classification report",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "590c774d-46b8-4f92-abf2-ddd0f496d283",
+    "action": "Confirm supporting invoices and job cards are attached to maintenance spend",
+    "owner": "Finance / Maintenance",
+    "priority": "Routine",
+    "due_label": "Ongoing",
+    "status": "Completed",
+    "evidence": "Supporting-document checklist",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "76b53b8b-cb72-4a61-9770-6fcedb6abe07",
+    "action": "Prepare management summary of highest-cost machines and suppliers",
+    "owner": "Finance",
+    "priority": "Routine",
+    "due_label": "Monthly",
+    "status": "Completed",
+    "evidence": "Monthly cost management report",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  }
+]

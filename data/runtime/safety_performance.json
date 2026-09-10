@@ -1,0 +1,74 @@
+[
+  {
+    "id": "c954953d-d370-4db6-9c26-b650718c6d3a",
+    "indicator": "Scratch-Free Days",
+    "result": "699",
+    "status": "Good",
+    "comment": "Continue current controls and reporting.",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "106c0606-70e1-418c-9a53-7415cf313018",
+    "indicator": "LTI-Free Days",
+    "result": "119",
+    "status": "Good",
+    "comment": "No lost-time injury recorded in the reporting period.",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "214ba4bc-3c23-4d55-bab5-27a44883def3",
+    "indicator": "Incident Description",
+    "result": "None",
+    "status": "Clean",
+    "comment": "No incident description was recorded.",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "b0c23797-100b-496b-9305-7d49f8830636",
+    "indicator": "Investigation Actions",
+    "result": "All closed out",
+    "status": "Closed",
+    "comment": "No investigation actions remain outstanding.",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "4171d60f-1933-4dff-8f8f-9faf383071a0",
+    "indicator": "Near Misses",
+    "result": "0",
+    "status": "Clean",
+    "comment": "No near misses reported.",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "49432307-88b8-4abb-bdd8-5bb695af1cfa",
+    "indicator": "VFLs",
+    "result": "2",
+    "status": "Recorded",
+    "comment": "Two Visible Felt Leadership activities completed.",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "0c87cdb1-4636-4f7b-b3c0-4a300441ed1e",
+    "indicator": "VFL Actions Closed",
+    "result": "2",
+    "status": "100% Closed",
+    "comment": "All VFL actions closed.",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "57b50a71-390a-4474-b91a-91a71eb81d36",
+    "indicator": "High-Potential Hazards / Unsafe Acts / Conditions",
+    "result": "0",
+    "status": "Clear",
+    "comment": "No high-potential hazards or unsafe acts recorded.",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "78c7edb4-fca0-4101-9924-7aa2572739a3",
+    "indicator": "Inspections",
+    "result": "1",
+    "status": "Completed",
+    "comment": "One inspection completed.",
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  }
+]

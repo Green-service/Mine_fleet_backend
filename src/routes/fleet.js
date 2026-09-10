@@ -1,6 +1,6 @@
 import { Router } from "express";
-import { resolveActor } from "../middleware/actor.js";
-import { addUnit, getFleet, removeUnit, updateUnit } from "../services/fleetService.js";
+import { addUnit, equipmentSummary, getFleet, plantRegister, removeUnit, updateUnit } from "../services/fleetService.js";
+import { mountCollection } from "./collectionRoutes.js";
 
 export const fleetRouter = Router();
 
@@ -14,7 +14,7 @@ fleetRouter.get("/", async (_req, res, next) => {
 
 fleetRouter.post("/", async (req, res, next) => {
   try {
-    res.status(201).json(await addUnit(req.body || {}, resolveActor(req)));
+    res.status(201).json(await addUnit(req.body || {}, req.actor));
   } catch (err) {
     next(err);
   }
@@ -22,7 +22,7 @@ fleetRouter.post("/", async (req, res, next) => {
 
 fleetRouter.patch("/:id", async (req, res, next) => {
   try {
-    res.json(await updateUnit(req.params.id, req.body || {}, resolveActor(req)));
+    res.json(await updateUnit(req.params.id, req.body || {}, req.actor));
   } catch (err) {
     next(err);
   }
@@ -30,8 +30,11 @@ fleetRouter.patch("/:id", async (req, res, next) => {
 
 fleetRouter.delete("/:id", async (req, res, next) => {
   try {
-    res.json(await removeUnit(req.params.id, resolveActor(req)));
+    res.json(await removeUnit(req.params.id, req.actor));
   } catch (err) {
     next(err);
   }
 });
+
+mountCollection(fleetRouter, "/equipment-summary", equipmentSummary, { readOnly: true });
+mountCollection(fleetRouter, "/plant-register", plantRegister, { readOnly: true });

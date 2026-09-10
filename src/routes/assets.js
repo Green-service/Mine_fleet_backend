@@ -1,5 +1,4 @@
 import { Router } from "express";
-import { resolveActor } from "../middleware/actor.js";
 import {
   createAsset,
   getAssetBin,
@@ -30,7 +29,7 @@ assetsRouter.get("/", async (_req, res, next) => {
 
 assetsRouter.post("/", async (req, res, next) => {
   try {
-    res.status(201).json(await createAsset(req.body, resolveActor(req)));
+    res.status(201).json(await createAsset(req.body, req.actor));
   } catch (err) {
     next(err);
   }
@@ -38,7 +37,7 @@ assetsRouter.post("/", async (req, res, next) => {
 
 assetsRouter.post("/:id/restore", async (req, res, next) => {
   try {
-    res.json(await restoreAsset(req.params.id, resolveActor(req)));
+    res.json(await restoreAsset(req.params.id, req.actor));
   } catch (err) {
     next(err);
   }
@@ -54,7 +53,7 @@ assetsRouter.get("/:id", async (req, res, next) => {
 
 assetsRouter.patch("/:id", async (req, res, next) => {
   try {
-    res.json(await updateAsset(req.params.id, req.body, resolveActor(req)));
+    res.json(await updateAsset(req.params.id, req.body, req.actor));
   } catch (err) {
     next(err);
   }
@@ -62,7 +61,7 @@ assetsRouter.patch("/:id", async (req, res, next) => {
 
 assetsRouter.delete("/:id", async (req, res, next) => {
   try {
-    res.json(await removeAsset(req.params.id, resolveActor(req)));
+    res.json(await removeAsset(req.params.id, req.actor));
   } catch (err) {
     next(err);
   }

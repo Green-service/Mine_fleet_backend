@@ -1,0 +1,332 @@
+[
+  {
+    "id": "4a3f5e82-7357-4256-a04f-8ad4f94f0785",
+    "page": "diesel",
+    "group_key": "by-machine",
+    "tone": "red",
+    "label": "CMPG022",
+    "text": "26.4 L/hr — above expected range",
+    "sort_order": 0,
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "26ad8381-56bb-4308-8852-0576a34a7f30",
+    "page": "diesel",
+    "group_key": "by-machine",
+    "tone": "red",
+    "label": "CMPG044",
+    "text": "Sudden increase of 31%",
+    "sort_order": 1,
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "a18cf6c7-979c-4e18-939b-44ca5aa3ad18",
+    "page": "diesel",
+    "group_key": "by-machine",
+    "tone": "amber",
+    "label": "CMPG088",
+    "text": "High monthly usage",
+    "sort_order": 2,
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "5ca1b821-1684-4dd8-9c26-8177612e9c83",
+    "page": "diesel",
+    "group_key": "by-machine",
+    "tone": "amber",
+    "label": "CMPG054",
+    "text": "Missing closing meter",
+    "sort_order": 3,
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "9da62068-0a2c-4d00-9b12-c2203be73477",
+    "page": "diesel",
+    "group_key": "by-machine",
+    "tone": "blue",
+    "label": "CMPG050",
+    "text": "Fuel issued while on breakdown",
+    "sort_order": 4,
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "98b0069e-c3cb-4976-bb3e-22090b949025",
+    "page": "diesel",
+    "group_key": "by-machine",
+    "tone": "green",
+    "label": "TT125",
+    "text": "Best fuel efficiency this week",
+    "sort_order": 5,
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "a5051877-960c-42f4-9979-dc19234c23a8",
+    "page": "diesel",
+    "group_key": "gg-reconciliation",
+    "tone": "amber",
+    "label": "28 L Difference",
+    "text": "TMM consumption register vs total diesel issued",
+    "sort_order": 0,
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "96579ce8-edc0-4fbe-bcc9-489c2648cde0",
+    "page": "diesel",
+    "group_key": "gg-reconciliation",
+    "tone": "red",
+    "label": "-830 L",
+    "text": "Largest pump variance requiring investigation",
+    "sort_order": 1,
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "91a1bee4-e415-476b-b078-689be4a46eb8",
+    "page": "diesel",
+    "group_key": "gg-reconciliation",
+    "tone": "red",
+    "label": "CMPG067",
+    "text": "29.75 L/hr — highest recorded consumption rate",
+    "sort_order": 2,
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "ad93e361-4f80-458e-86c8-2bb432d87d19",
+    "page": "diesel",
+    "group_key": "gg-reconciliation",
+    "tone": "red",
+    "label": "CMPG097",
+    "text": "23.03 L/hr — above expected range",
+    "sort_order": 3,
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "9106a3ab-917b-470b-bf21-783a613ae735",
+    "page": "diesel",
+    "group_key": "gg-reconciliation",
+    "tone": "green",
+    "label": "Closing Stock",
+    "text": "24,137 L recorded",
+    "sort_order": 4,
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "20f5cdc1-5715-4c34-aeb3-50c838e8f634",
+    "page": "diesel",
+    "group_key": "gg-reconciliation",
+    "tone": "blue",
+    "label": "Control",
+    "text": "Require supervisor sign-off for high variances",
+    "sort_order": 5,
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "b00d6bac-cde4-4d55-ac03-8bc6cee9ee94",
+    "page": "breakdowns",
+    "group_key": "critical-spares",
+    "tone": "green",
+    "label": "GG",
+    "text": "Filters, ground-engaging tools, belts, electrical spares, Scania parts, tyres, rims and oils",
+    "sort_order": 0,
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "7f830a07-5316-49c4-b68f-fa211c118806",
+    "page": "breakdowns",
+    "group_key": "critical-spares",
+    "tone": "green",
+    "label": "BLF",
+    "text": "Pre-cleaner, alarms, hooters, lights, lubricants and coolant",
+    "sort_order": 1,
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "a6144773-d24f-42cc-a4e3-7267d06f7601",
+    "page": "breakdowns",
+    "group_key": "critical-spares",
+    "tone": "red",
+    "label": "Critical",
+    "text": "Propshaft, park-brake kits, alternator, starter, V-belts, tensioner pulley, water pump, gauges and steering valves",
+    "sort_order": 2,
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "26e2d6b8-efc2-449f-a2f6-25aba86e01ac",
+    "page": "breakdowns",
+    "group_key": "critical-spares",
+    "tone": "blue",
+    "label": "General",
+    "text": "Steering pump, lift cylinder, spare tyre, jumper pack and 2-ton trestle",
+    "sort_order": 3,
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "3f518d64-c6b0-4a55-acb2-0687616fd262",
+    "page": "safety",
+    "group_key": "performance",
+    "tone": "green",
+    "label": "PTO 96%",
+    "text": "Two employees are scheduled for PTO this week.",
+    "sort_order": 0,
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "a2e237f9-cfce-4bd3-ba43-a4f7338e79aa",
+    "page": "safety",
+    "group_key": "performance",
+    "tone": "amber",
+    "label": "Training 64%",
+    "text": "Training remains below target while awaiting a quotation from the service provider.",
+    "sort_order": 1,
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "97479e6d-22b2-47b5-a826-92e0f62e07d2",
+    "page": "safety",
+    "group_key": "performance",
+    "tone": "blue",
+    "label": "RA vs Job Cards",
+    "text": "22 risk assessments compared with 18 job cards.",
+    "sort_order": 2,
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "751d3a5f-c707-4db7-89b2-ac551307c1f3",
+    "page": "safety",
+    "group_key": "performance",
+    "tone": "amber",
+    "label": "Contractor Compliance",
+    "text": "Waterberg Construction safety file still needs verification.",
+    "sort_order": 3,
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "909cb14c-04bd-4b6c-b07c-c84e5f0f2589",
+    "page": "safety",
+    "group_key": "performance",
+    "tone": "green",
+    "label": "Investigation Close-out",
+    "text": "All actions are closed.",
+    "sort_order": 4,
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "9479e859-6aea-412b-b9d0-6184a68e1611",
+    "page": "safety",
+    "group_key": "combination-summary",
+    "tone": "blue",
+    "label": "Scheduled",
+    "text": "213 actions",
+    "sort_order": 0,
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "2b62a6ca-d013-41c4-abeb-f19e18171bef",
+    "page": "safety",
+    "group_key": "combination-summary",
+    "tone": "amber",
+    "label": "Not Started",
+    "text": "10 actions",
+    "sort_order": 1,
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "a7ba5858-5fa9-414d-ab14-e4dae51703a9",
+    "page": "safety",
+    "group_key": "combination-summary",
+    "tone": "amber",
+    "label": "In Progress",
+    "text": "47 actions",
+    "sort_order": 2,
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "136a3932-bdc7-4567-b584-bca770e5aaf4",
+    "page": "safety",
+    "group_key": "combination-summary",
+    "tone": "green",
+    "label": "Completed",
+    "text": "583 actions",
+    "sort_order": 3,
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "e375f9fa-5d59-47d7-870c-a5d08018614d",
+    "page": "safety",
+    "group_key": "combination-summary",
+    "tone": "blue",
+    "label": "Not Applicable",
+    "text": "7 actions",
+    "sort_order": 4,
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "64ab568a-2f19-473d-9e0d-762cdf73a772",
+    "page": "safety",
+    "group_key": "combination-summary",
+    "tone": "amber",
+    "label": "Completed Overdue",
+    "text": "71 actions",
+    "sort_order": 5,
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "000470d0-c9e3-4157-ba68-c8e8c090d352",
+    "page": "safety",
+    "group_key": "combination-summary",
+    "tone": "red",
+    "label": "Overdue",
+    "text": "2 actions",
+    "sort_order": 6,
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "7e755b41-ec8b-4df2-962d-4dc3b5433580",
+    "page": "hr",
+    "group_key": "payroll-structure",
+    "tone": null,
+    "label": "Employee & Time",
+    "text": "Employee No, Employee, Hourly Rate, Normal Hours, Weekly Overtime, Saturday, Sunday, Public Holiday",
+    "sort_order": 0,
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "6c6d5dda-2083-41df-9061-86b1c4a3e2ac",
+    "page": "hr",
+    "group_key": "payroll-structure",
+    "tone": null,
+    "label": "Shift & Allowances",
+    "text": "Night Shifts Worked, Night Shift Allowance, Shift Worked, Shift Allowance, Standby Allowance, 13th Cheque",
+    "sort_order": 1,
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "f81aa1ad-8c3a-4303-a555-397f27981acf",
+    "page": "hr",
+    "group_key": "payroll-structure",
+    "tone": null,
+    "label": "Earnings",
+    "text": "Gross Earning",
+    "sort_order": 2,
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "f542155d-443a-4171-aac6-eca711e09e58",
+    "page": "hr",
+    "group_key": "payroll-structure",
+    "tone": null,
+    "label": "Deductions",
+    "text": "PAYE, UIF, Loan Deductions, BCCEI, Union, Provident Fund",
+    "sort_order": 3,
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  },
+  {
+    "id": "5dc1edd3-d408-4f9f-95cf-96f5c3400b2a",
+    "page": "hr",
+    "group_key": "payroll-structure",
+    "tone": null,
+    "label": "Net Pay",
+    "text": "Net Earnings",
+    "sort_order": 4,
+    "created_at": "2026-09-09T20:24:11.207946+00:00"
+  }
+]

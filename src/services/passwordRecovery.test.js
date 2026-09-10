@@ -5,6 +5,14 @@ process.env.SUPABASE_URL = "https://recovery-test.invalid";
 process.env.SUPABASE_ANON_KEY = "test-key";
 process.env.CLIENT_ORIGIN = "https://mpg-test.invalid";
 const { requestPasswordReset, resetPassword } = await import("./passwordRecovery.js");
+const { createAuthClient, supabase } = await import("../lib/supabase.js");
+
+test("user auth sessions never reuse the database client or another user's client", () => {
+  const first = createAuthClient();
+  const second = createAuthClient();
+  assert.notEqual(first, second);
+  assert.notEqual(first, supabase);
+});
 
 function mockFetch(t, handler) {
   const original = globalThis.fetch;

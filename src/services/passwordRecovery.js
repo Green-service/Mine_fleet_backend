@@ -1,23 +1,15 @@
-import { createClient } from "@supabase/supabase-js";
-import { env, usingSupabase } from "../config/env.js";
+import { env } from "../config/env.js";
+import { createAuthClient } from "../lib/supabase.js";
 
 function failure(message, status = 400) {
   return Object.assign(new Error(message), { status });
-}
-
-function recoveryClient() {
-  if (!usingSupabase) throw failure("Password reset is not configured on this server.", 503);
-  // Never attach a recovery session to the shared database or auth client.
-  return createClient(env.supabaseUrl, env.supabaseAnonKey || env.supabaseKey, {
-    auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false, flowType: "implicit" },
-  });
 }
 
 export async function requestPasswordReset(email) {
   if (typeof email !== "string" || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
     throw failure("Enter a valid work email.");
   }
-  const client = recoveryClient();
+  const client = createAuthClient();
   const { error } = await client.auth.resetPasswordForEmail(email.trim().toLowerCase(), {
     redirectTo: `${env.clientOrigin.replace(/\/$/, "")}/reset-password`,
   });
@@ -35,7 +27,7 @@ export async function resetPassword({ accessToken, refreshToken, password } = {}
   if (typeof password !== "string" || password.length < 8) {
     throw failure("Use at least 8 characters for your new password.");
   }
-  const client = recoveryClient();
+  const client = createAuthClient();
   const { data, error } = await client.auth.setSession({ access_token: accessToken, refresh_token: refreshToken });
   if (error || !data?.user) throw failure("This reset link is invalid or expired. Request a new link.");
   const { error: updateError } = await client.auth.updateUser({ password });

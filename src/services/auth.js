@@ -1,6 +1,7 @@
 import { env, usingSupabase } from "../config/env.js";
-import { supabase, supabaseAuth } from "../lib/supabase.js";
+import { supabase, createAuthClient } from "../lib/supabase.js";
 import { loadActor } from "./profiles.js";
+import { signInError } from "./authErrors.js";
 
 function sessionPayload(session, actor) {
   return {
@@ -17,11 +18,9 @@ export async function signInWithPassword(email, password) {
     err.status = 503;
     throw err;
   }
-  const { data, error } = await supabaseAuth.auth.signInWithPassword({ email, password });
+  const { data, error } = await createAuthClient().auth.signInWithPassword({ email, password });
   if (error || !data?.session) {
-    const err = new Error("Invalid email or password");
-    err.status = 401;
-    throw err;
+    throw signInError(error);
   }
   const actor = await loadActor(data.user.id);
   if (!actor) {
@@ -43,7 +42,7 @@ export async function refreshSession(refreshToken) {
     err.status = 400;
     throw err;
   }
-  const { data, error } = await supabaseAuth.auth.refreshSession({ refresh_token: refreshToken });
+  const { data, error } = await createAuthClient().auth.refreshSession({ refresh_token: refreshToken });
   if (error || !data?.session) {
     const err = new Error("Session expired — sign in again.");
     err.status = 401;
@@ -62,7 +61,7 @@ export async function refreshSession(refreshToken) {
  * requireAuth middleware on every protected request. */
 export async function actorFromAccessToken(accessToken) {
   if (!usingSupabase || !accessToken) return null;
-  const { data, error } = await supabaseAuth.auth.getUser(accessToken);
+  const { data, error } = await createAuthClient().auth.getUser(accessToken);
   if (error || !data?.user) return null;
   return loadActor(data.user.id);
 }
@@ -86,7 +85,7 @@ export async function sessionFromGoogleToken(accessToken) {
     err.status = 503;
     throw err;
   }
-  const { data, error } = await supabaseAuth.auth.getUser(accessToken);
+  const { data, error } = await createAuthClient().auth.getUser(accessToken);
   if (error || !data?.user) {
     const err = new Error(error?.message || "Google sign-in could not be verified.");
     err.status = 401;

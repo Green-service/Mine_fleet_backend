@@ -16,12 +16,15 @@ function initialsFrom(name, email) {
  * never provisioned into the app) or the account has been deactivated. */
 export async function loadActor(userId) {
   const { data: profile, error: perr } = await supabase.from("profiles").select("*").eq("id", userId).maybeSingle();
-  if (perr || !profile) return null;
+  if (perr) throw Object.assign(new Error("Could not load your account profile. Contact Head Office to check the server configuration."), { status: 503 });
+  if (!profile) return null;
 
-  const { data: appUser } = await supabase.from("app_users").select("*").eq("id", userId).maybeSingle();
+  const { data: appUser, error: uerr } = await supabase.from("app_users").select("*").eq("id", userId).maybeSingle();
+  if (uerr) throw Object.assign(new Error("Could not verify account access. Please try again later."), { status: 503 });
   if (appUser && appUser.is_active === false) return null;
 
-  const { data: role } = await supabase.from("roles").select("*").eq("slug", profile.role_slug).maybeSingle();
+  const { data: role, error: rerr } = await supabase.from("roles").select("*").eq("slug", profile.role_slug).maybeSingle();
+  if (rerr) throw Object.assign(new Error("Could not load account permissions. Please try again later."), { status: 503 });
 
   return {
     id: profile.id,

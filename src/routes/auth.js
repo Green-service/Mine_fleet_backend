@@ -1,7 +1,24 @@
 import { Router } from "express";
+import { requestPasswordReset, resetPassword } from "../services/passwordRecovery.js";
 import { googleAuthorizeUrl, refreshSession, sessionFromGoogleToken, signInWithPassword } from "../services/auth.js";
 
 export const authRouter = Router();
+
+authRouter.post("/forgot-password", async (req, res, next) => {
+  try {
+    res.json(await requestPasswordReset(req.body?.email));
+  } catch (err) {
+    next(err);
+  }
+});
+
+authRouter.post("/reset-password", async (req, res, next) => {
+  try {
+    res.json(await resetPassword(req.body || {}));
+  } catch (err) {
+    next(err);
+  }
+});
 
 authRouter.post("/login", async (req, res, next) => {
   try {

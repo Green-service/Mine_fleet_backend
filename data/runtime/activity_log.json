@@ -1,1 +1,10 @@
-[]
+[
+  {
+    "id": "eccb86c5-bf79-441f-b6e8-dd87c882ca00",
+    "actor": "System",
+    "action": "captured a purchase order",
+    "kind": "finance",
+    "time_label": "10:11",
+    "created_at": "2026-09-11T08:11:44.081+00:00"
+  }
+]

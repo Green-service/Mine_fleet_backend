@@ -1,6 +1,6 @@
 import * as catalog from "../data/catalog.js";
 import * as ref from "../data/referenceCatalog.js";
-import { readTable } from "./store.js";
+import { deleteRow, insertRow, readTable, updateRow } from "./store.js";
 import { makeCollection, optStr, str } from "./collectionService.js";
 
 function num(value) {
@@ -55,6 +55,44 @@ export async function getFinance() {
       ? `${top.machine} is the dearest unit this month — ${top.driver.toLowerCase()}.`
       : "Capture machine costs to populate the monthly register.",
   };
+}
+
+function machinePayload(input, previous = {}) {
+  const machine = str(input.machine, previous.machine);
+  if (!machine) {
+    const err = new Error("Enter a machine.");
+    err.status = 400;
+    throw err;
+  }
+  return {
+    machine,
+    driver: optStr(input.driver, previous.driver),
+    total: num(input.total ?? previous.total),
+  };
+}
+
+export async function createMachine(body) {
+  const payload = machinePayload(body);
+  const saved = await insertRow("machine_costs", payload, catalog.machineCosts);
+  return toMachine({ ...payload, ...saved }, 0);
+}
+
+export async function updateMachine(id, body) {
+  const machines = await readTable("machine_costs", catalog.machineCosts);
+  const previous = machines.find((row) => row.id === id);
+  if (!previous) {
+    const err = new Error("Record not found");
+    err.status = 404;
+    throw err;
+  }
+  const payload = machinePayload(body, toMachine(previous, 0));
+  const saved = await updateRow("machine_costs", id, payload, catalog.machineCosts);
+  return toMachine({ ...previous, ...payload, ...saved, id }, 0);
+}
+
+export async function removeMachine(id) {
+  await deleteRow("machine_costs", id, catalog.machineCosts);
+  return { ok: true };
 }
 
 // ---------------------------------------------------------------------------

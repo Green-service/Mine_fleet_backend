@@ -7,7 +7,10 @@ import { requirePermission } from "../middleware/requirePermission.js";
 import {
   createRole, inviteUser, listRoles, listUsers, removeRole, revokeUser, updateRole, updateUser,
 } from "../services/rolesService.js";
-import { ccma, clockEmployee, disciplinary, getHrData, increases, listManpowerTotals, manpower, promotions, recruitment } from "../services/hrService.js";
+import {
+  ccma, claims, clockEmployee, disciplinary, employees, getHrData, increases, leave,
+  listManpowerTotals, manpower, promotions, recruitment,
+} from "../services/hrService.js";
 import { mountCollection } from "./collectionRoutes.js";
 import { authRouter } from "./auth.js";
 import { productionRouter } from "./production.js";
@@ -163,6 +166,9 @@ mountCollection(router, "/hr/increases", increases);
 mountCollection(router, "/hr/promotions", promotions);
 mountCollection(router, "/hr/disciplinary", disciplinary);
 mountCollection(router, "/hr/ccma", ccma);
+mountCollection(router, "/hr/employees", employees);
+mountCollection(router, "/hr/leave", leave);
+mountCollection(router, "/hr/claims", claims);
 
 router.get("/reports", (_req, res) => {
   res.json({

@@ -68,18 +68,15 @@ function buildSummary(employees, leave, claims, roles) {
 }
 
 async function readEmployees() {
-  const rows = await readTable("employees", catalog.employees);
-  return rows.map(toEmployee);
+  return employees.list();
 }
 
 async function readLeave() {
-  const rows = await readTable("leave_requests", catalog.leave);
-  return rows.map(toLeave);
+  return leave.list();
 }
 
 async function readClaims() {
-  const rows = await readTable("claims", catalog.claims);
-  return rows.map(toClaim);
+  return claims.list();
 }
 
 export async function getHrData({ roles, invites, users }) {
@@ -125,6 +122,66 @@ export async function clockEmployee(body) {
   Object.assign(saved, row);
   return row;
 }
+
+// ---------------------------------------------------------------------------
+// Employees, leave and claims registers
+// ---------------------------------------------------------------------------
+
+function employeePayload(input, previous = {}) {
+  const name = str(input.name, previous.full_name);
+  const number = str(input.number, previous.employee_no).toUpperCase();
+  if (!name || !number) {
+    const err = new Error("Employee number and name are required.");
+    err.status = 400;
+    throw err;
+  }
+  return {
+    full_name: name,
+    employee_no: number,
+    title: optStr(input.title, previous.title) || "Manual entry",
+    site: optStr(input.site, previous.site) || "Grootegeluk",
+    shift: optStr(input.shift, previous.shift) || "Day",
+    hourly_rate: cnum(input.rate ?? previous.hourly_rate),
+    status: optStr(input.status, previous.status) || "Pending approval",
+    role_slug: optStr(input.role, previous.role_slug) || "plant-operator",
+  };
+}
+export const employees = makeCollection("employees", catalog.employees, { toRow: toEmployee, toPayload: employeePayload });
+
+function leavePayload(input, previous = {}) {
+  const employee = str(input.employee, previous.employee);
+  if (!employee) {
+    const err = new Error("Enter an employee name.");
+    err.status = 400;
+    throw err;
+  }
+  return {
+    employee,
+    leave_type: optStr(input.type, previous.leave_type) || "Annual",
+    from_date: optStr(input.from, previous.from_date),
+    to_date: optStr(input.to, previous.to_date),
+    days: cnum(input.days ?? previous.days),
+    status: optStr(input.status, previous.status) || "Pending",
+  };
+}
+export const leave = makeCollection("leave_requests", catalog.leave, { toRow: toLeave, toPayload: leavePayload });
+
+function claimPayload(input, previous = {}) {
+  const employee = str(input.employee, previous.employee);
+  if (!employee) {
+    const err = new Error("Enter an employee name.");
+    err.status = 400;
+    throw err;
+  }
+  return {
+    ref: optStr(input.ref, previous.ref) || `CLM-${Date.now().toString(36).toUpperCase()}`,
+    employee,
+    claim_type: optStr(input.type, previous.claim_type) || "General",
+    amount: cnum(input.amount ?? previous.amount),
+    status: optStr(input.status, previous.status) || "Pending",
+  };
+}
+export const claims = makeCollection("claims", catalog.claims, { toRow: toClaim, toPayload: claimPayload });
 
 // ---------------------------------------------------------------------------
 // Static/historical registers migrated off local component state

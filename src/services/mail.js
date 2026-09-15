@@ -5,7 +5,7 @@ import { buildInviteEmailHtml, buildNotificationEmailHtml } from "./mailTemplate
 function inviteMessage({ name, email, role, site, password, loginUrl }) {
   return [
     `Good day ${name},`,
-    `You have been invited to BRAINSTAK as ${role}${site ? ` at ${site}` : ""}.`,
+    `You have been invited to MPG as ${role}${site ? ` at ${site}` : ""}.`,
     `Sign in at ${loginUrl}`,
     `Work email: ${email}`,
     `Temporary password: ${password}`,
@@ -67,8 +67,8 @@ export async function sendInviteEmail(params) {
   const ok = await sendOpsEmail({
     to: params.email,
     toName: params.name,
-    title: "BRAINSTAK invite",
-    subject: "You've been invited to BRAINSTAK",
+    title: "MPG invite",
+    subject: "You've been invited to MPG",
     message: inviteMessage(params),
     html: buildInviteEmailHtml(params),
     templateParams: {

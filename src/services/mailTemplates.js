@@ -74,7 +74,7 @@ export function buildNotificationEmailText({ title, message, actor = "A team mem
   return [title, "", `${actor} ${action}.`, "", message, ""].filter(Boolean).join("\n");
 }
 
-/** EmailJS / HTML template for BRAINSTAK user invites with a temporary password. */
+/** EmailJS / HTML template for MPG user invites with a temporary password. */
 export function buildInviteEmailHtml({ name, email, role, site, password, loginUrl }) {
   const safe = (value) =>
     String(value ?? "")
@@ -88,7 +88,7 @@ export function buildInviteEmailHtml({ name, email, role, site, password, loginU
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>You're invited to BRAINSTAK</title>
+  <title>You're invited to MPG</title>
 </head>
 <body style="margin:0;padding:0;background:#f3f5f9;font-family:IBM Plex Sans,Segoe UI,Arial,sans-serif;color:#151820;">
   <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#f3f5f9;padding:24px 12px;">
@@ -97,14 +97,14 @@ export function buildInviteEmailHtml({ name, email, role, site, password, loginU
         <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:560px;background:#ffffff;border:1px solid #e6e8ee;border-radius:16px;overflow:hidden;">
           <tr>
             <td style="padding:20px 22px 12px;border-bottom:1px solid #eef0f5;">
-              <div style="font-size:11px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:#6d7484;">BRAINSTAK</div>
+              <div style="font-size:11px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:#6d7484;">MPG</div>
               <h1 style="margin:8px 0 0;font-size:20px;line-height:1.3;letter-spacing:-0.02em;">You've been invited</h1>
             </td>
           </tr>
           <tr>
             <td style="padding:18px 22px;">
               <p style="margin:0 0 12px;font-size:14px;line-height:1.55;color:#3d4452;">
-                Good day <strong>${safe(name)}</strong>, you've been added to BRAINSTAK as <strong>${safe(role)}</strong>${site ? ` at <strong>${safe(site)}</strong>` : ""}.
+                Good day <strong>${safe(name)}</strong>, you've been added to MPG as <strong>${safe(role)}</strong>${site ? ` at <strong>${safe(site)}</strong>` : ""}.
               </p>
               <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin:16px 0;background:#f7f8fb;border:1px solid #eef0f5;border-radius:10px;">
                 <tr>
@@ -121,7 +121,7 @@ export function buildInviteEmailHtml({ name, email, role, site, password, loginU
               </p>
               ${
                 loginUrl
-                  ? `<p style="margin:18px 0 0;"><a href="${safe(loginUrl)}" style="display:inline-block;padding:10px 18px;border-radius:10px;background:#2f6fed;color:#ffffff;text-decoration:none;font-size:13px;font-weight:700;">Sign in to BRAINSTAK</a></p>`
+                  ? `<p style="margin:18px 0 0;"><a href="${safe(loginUrl)}" style="display:inline-block;padding:10px 18px;border-radius:10px;background:#2f6fed;color:#ffffff;text-decoration:none;font-size:13px;font-weight:700;">Sign in to MPG</a></p>`
                   : ""
               }
             </td>

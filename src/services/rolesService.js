@@ -7,6 +7,8 @@ import * as catalog from "../data/catalog.js";
 import { deleteRow, insertRow, readTable, updateRow } from "./store.js";
 import { numberValue } from "./validation.js";
 
+const INVITE_LOGIN_URL = "https://mpgmine.netlify.app/login";
+
 function dbError(error, fallback = "Database error") {
   const err = new Error(error?.message || fallback);
   err.status = 500;
@@ -364,7 +366,7 @@ export async function inviteUser({ name, email, role, site }) {
       role: matchedRole?.name || roleName,
       site: homeSite,
       password,
-      loginUrl: `${env.clientOrigin}/login`,
+      loginUrl: INVITE_LOGIN_URL,
     });
   } catch (err) {
     await rollback();

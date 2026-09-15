@@ -57,5 +57,5 @@ maintenanceRouter.get("/attention-static", async (_req, res, next) => {
 
 mountCollection(maintenanceRouter, "/full-register", fullRegister);
 mountCollection(maintenanceRouter, "/status-by-group", statusByGroup, { readOnly: true });
-mountCollection(maintenanceRouter, "/service-plan-static", servicePlanStatic, { readOnly: true });
+mountCollection(maintenanceRouter, "/service-plan-static", servicePlanStatic);
 mountCollection(maintenanceRouter, "/backlog", backlog);

@@ -2,6 +2,10 @@ import * as catalog from "../data/catalog.js";
 import * as ref from "../data/referenceCatalog.js";
 import { deleteRow, insertRow, readTable, updateRow } from "./store.js";
 import { makeCollection, optStr, str } from "./collectionService.js";
+import { validateInput } from "./validation.js";
+import { createActionTracker } from "./actionTrackerService.js";
+
+export const financeActionTracker = createActionTracker("finance_action_tracker", "FIN");
 
 function num(value) {
   const n = Number(value ?? 0);
@@ -58,6 +62,7 @@ export async function getFinance() {
 }
 
 function machinePayload(input, previous = {}) {
+  validateInput("machine_costs", input);
   const machine = str(input.machine, previous.machine);
   if (!machine) {
     const err = new Error("Enter a machine.");

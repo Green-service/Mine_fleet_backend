@@ -3,7 +3,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
-const RUNTIME_DIR = path.join(root, "data", "runtime");
+const RUNTIME_DIR = process.env.MPG_RUNTIME_DIR || path.join(root, "data", "runtime");
 
 export const TABLE_CATALOG_KEYS = {
   production_shifts: "productionDaily",
@@ -40,21 +40,30 @@ export function readRuntime(table) {
     const raw = fs.readFileSync(tablePath(table), "utf8");
     const parsed = JSON.parse(raw);
     return Array.isArray(parsed) ? parsed : null;
-  } catch {
-    return null;
+  } catch (error) {
+    if (error.code === "ENOENT") return null;
+    throw Object.assign(new Error(`Cannot read the saved ${table.replaceAll("_", " ")} register. Check local storage before retrying.`), { status: 503 });
   }
 }
 
 export function writeRuntime(table, rows) {
   fs.mkdirSync(RUNTIME_DIR, { recursive: true });
-  fs.writeFileSync(tablePath(table), JSON.stringify(rows, null, 2), "utf8");
+  const destination = tablePath(table);
+  const temporary = `${destination}.${crypto.randomUUID()}.tmp`;
+  try {
+    fs.writeFileSync(temporary, JSON.stringify(rows, null, 2), "utf8");
+    fs.renameSync(temporary, destination);
+  } catch (error) {
+    if (fs.existsSync(temporary)) fs.unlinkSync(temporary);
+    throw Object.assign(new Error(`Cannot save the ${table.replaceAll("_", " ")} register. Check local storage and retry.`), { status: 503 });
+  }
 }
 
 export function hydrateCatalog(catalog) {
   let loaded = 0;
   for (const [table, key] of Object.entries(TABLE_CATALOG_KEYS)) {
     const saved = readRuntime(table);
-    if (!saved?.length) continue;
+    if (!Array.isArray(saved)) continue;
     const target = catalog[key];
     if (Array.isArray(target)) {
       target.length = 0;

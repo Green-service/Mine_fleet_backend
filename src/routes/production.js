@@ -1,11 +1,23 @@
 import { Router } from "express";
 import {
-  captureHour, captureShift, forecastDaily, forecastWeek, getBoard, ggDaily, ggHours, ggWeek, blfDaily,
+  captureHour, captureShift, forecastDaily, forecastWeek, getBoard, getMachineHours, ggDaily, ggHours, ggWeek, ggWeekLegacy, blfDaily,
   removeHour, removeShift, updateHour, updateShift,
 } from "../services/productionService.js";
 import { mountCollection } from "./collectionRoutes.js";
 
 export const productionRouter = Router();
+
+productionRouter.get("/machine-hours", async (req, res, next) => {
+  try { res.json(await getMachineHours(req.query)); } catch (error) { next(error); }
+});
+
+productionRouter.get("/gg-week", async (req, res, next) => {
+  try { res.json(await ggWeek.list(req.query)); } catch (error) { next(error); }
+});
+productionRouter.all(["/gg-week", "/gg-week/:id"], (_req, res) => {
+  res.status(405).json({ error: "Weekly tonnage is calculated from daily captures. Add, edit or delete the daily entry to change the week." });
+});
+mountCollection(productionRouter, "/gg-week-legacy", ggWeekLegacy, { readOnly: true });
 
 productionRouter.get("/", async (_req, res, next) => {
   try {
@@ -64,7 +76,6 @@ productionRouter.delete("/hours/:id", async (req, res, next) => {
 });
 
 mountCollection(productionRouter, "/gg-daily", ggDaily);
-mountCollection(productionRouter, "/gg-week", ggWeek, { readOnly: true });
 mountCollection(productionRouter, "/forecast-daily", forecastDaily);
 mountCollection(productionRouter, "/forecast-week", forecastWeek, { readOnly: true });
 mountCollection(productionRouter, "/blf-daily", blfDaily);

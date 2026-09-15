@@ -1,7 +1,13 @@
 import * as catalog from "../data/catalog.js";
 import * as ref from "../data/referenceCatalog.js";
 import { deleteRow, insertRow, readTable, updateRow } from "./store.js";
-import { makeCollection, num as cnum, optNum, optStr, str } from "./collectionService.js";
+import { makeCollection, num as cnum, optStr } from "./collectionService.js";
+import { invalid, isoDate, numberValue, validateInput } from "./validation.js";
+import { ggDaily } from "./productionTonnage.js";
+import { calendarDate } from "./productionDates.js";
+import { machineReference } from "./productionMachine.js";
+export { ggDaily, ggWeek, ggWeekLegacy } from "./productionTonnage.js";
+export { getMachineHours } from "./machineHoursService.js";
 
 const SITE_CODE = {
   gg: "GG",
@@ -83,6 +89,7 @@ function toDailyRow(row) {
 function toHourRow(row) {
   return {
     id: row.id,
+    date: calendarDate(row.work_date ?? row.workDate ?? row.date),
     machine: row.machine,
     equipment: row.equipment,
     site: row.site || "Belfast",
@@ -116,20 +123,27 @@ function sumPairs(rows) {
   );
 }
 
-function siteCard(name, target, actual, behindNote, aheadNote) {
+function siteCard(name, target, actual) {
   const pct = target ? (actual / target) * 100 : 0;
+  const variance = actual - target;
   return {
     name,
     mtdTarget: target,
     mtdActual: actual,
     pct,
-    note: !target && !actual ? "No shifts captured this month." : pct >= 100 ? aheadNote : behindNote,
+    note: !target && !actual
+      ? "No production captured this month."
+      : !target
+        ? "Production captured without a target. Enter the target to measure achievement."
+        : variance === 0
+          ? "Captured production is on target."
+          : `${Math.abs(variance).toLocaleString("en-ZA")} t ${variance > 0 ? "above" : "below"} the captured month-to-date target.`,
   };
 }
 
 function buildSummary(daily, asOf = new Date()) {
   const tracked = daily.filter((row) => isTrackedSite(row.site));
-  const monthRows = tracked.filter((row) => sameMonth(row.workDate || row.date, asOf));
+  const monthRows = tracked.filter((row) => sameMonth(row.workDate || row.date, asOf) && parseDate(row.workDate || row.date) <= asOf);
   const todayRows = monthRows.filter((row) => sameDay(row.workDate || row.date, asOf));
   const today = sumPairs(todayRows);
   const month = sumPairs(monthRows);
@@ -144,15 +158,11 @@ function buildSummary(daily, asOf = new Date()) {
     "Grootegeluk",
     ggMonth.target,
     ggMonth.actual,
-    "Grootegeluk is behind plan — check loader and ADT hours.",
-    "Carrying group tonnes while Medupi recovers hours.",
   );
   const medupi = siteCard(
     "Medupi",
     medMonth.target,
     medMonth.actual,
-    "Unsafe-condition stoppages earlier in the month still show in the MTD gap.",
-    "Medupi is back on plan for the month.",
   );
 
   return {
@@ -167,7 +177,8 @@ function buildSummary(daily, asOf = new Date()) {
 }
 
 function persistPayload(input, previous = {}) {
-  const workDate = formatIso(input.date || input.work_date || input.workDate || previous.workDate || previous.date || new Date());
+  validateInput("production_shifts", input);
+  const workDate = isoDate(input.date ?? input.work_date ?? input.workDate ?? previous.workDate ?? previous.date, "Shift date");
   if (!workDate) {
     const err = new Error("Enter a valid shift date.");
     err.status = 400;
@@ -214,7 +225,8 @@ async function readHours() {
 }
 
 function hourPersistPayload(input, previous = {}) {
-  const machine = String(input.machine || previous.machine || "").trim();
+  validateInput("machine_hours", input);
+  const machine = machineReference(input.machine ?? previous.machine);
   if (!machine) {
     const err = new Error("Enter a machine or fleet number.");
     err.status = 400;
@@ -222,6 +234,7 @@ function hourPersistPayload(input, previous = {}) {
   }
   return {
     machine,
+    work_date: isoDate(input.date ?? input.work_date ?? previous.date, "Capture date", { required: false }),
     equipment: String(input.equipment ?? previous.equipment ?? "").trim(),
     site: String(input.site || previous.site || "Belfast").trim(),
     hours: num(input.hours ?? previous.hours),
@@ -234,9 +247,25 @@ function hourPersistPayload(input, previous = {}) {
 }
 
 export async function getBoard() {
-  const [daily, machineHoursBlf] = await Promise.all([readDaily(), readHours()]);
+  const [daily, machineHoursBlf, ggTotals, forecasts] = await Promise.all([readDaily(), readHours(), ggDaily.list(), forecastDaily.list()]);
+  // A daily GG total represents all shifts on that date. Override those shifts
+  // in KPI calculations to avoid counting the same production twice.
+  const ggDates = new Set(ggTotals.map((row) => formatIso(row.date)));
+  const shiftTargets = new Map();
+  for (const row of daily.filter((row) => normalizeSite(row.site) === "GG")) {
+    const date = formatIso(row.workDate || row.date);
+    shiftTargets.set(date, (shiftTargets.get(date) || 0) + num(row.target));
+  }
+  const forecastTargets = new Map(forecasts.map((row) => [formatIso(row.date), num(row.total)]));
+  const summaryRows = [
+    ...daily.filter((row) => normalizeSite(row.site) !== "GG" || !ggDates.has(formatIso(row.workDate || row.date))),
+    ...ggTotals.map((row) => ({
+      ...row, site: "GG", workDate: row.date,
+      target: num(row.target) || shiftTargets.get(formatIso(row.date)) || forecastTargets.get(formatIso(row.date)) || 0,
+    })),
+  ];
   return {
-    summary: buildSummary(daily),
+    summary: buildSummary(summaryRows),
     daily,
     machineHoursBlf,
   };
@@ -298,49 +327,6 @@ export async function removeHour(id) {
 // Static/historical registers migrated off local component state
 // ---------------------------------------------------------------------------
 
-function ggDailyRow(row) {
-  const target = cnum(row.target);
-  const actual = cnum(row.actual);
-  const variance = actual - target;
-  const pct = target ? Number(((actual / target) * 100).toFixed(1)) : 0;
-  return {
-    id: row.id,
-    date: row.work_date,
-    target,
-    actual,
-    variance,
-    pct,
-    status: pct >= 100 ? "Above Target" : "Below Target",
-  };
-}
-function ggDailyPayload(input, previous = {}) {
-  const workDate = str(input.date ?? input.work_date, previous.date);
-  if (!workDate) {
-    const err = new Error("Enter a date.");
-    err.status = 400;
-    throw err;
-  }
-  return { work_date: workDate, target: cnum(input.target ?? previous.target), actual: cnum(input.actual ?? previous.actual) };
-}
-export const ggDaily = makeCollection("production_gg_daily", ref.productionGgDaily, { toRow: ggDailyRow, toPayload: ggDailyPayload });
-
-function ggWeekRow(row) {
-  return {
-    id: row.id,
-    week: row.week,
-    range: row.range,
-    productLoader: row.product_loader,
-    sscc: row.sscc,
-    pci: row.pci,
-    snSs2: row.sn_ss2,
-    p2cSs2Be: row.p2c_ss2_be,
-    buffaloLoader: row.buffalo_loader,
-    screen: row.screen,
-    total: row.total,
-  };
-}
-export const ggWeek = makeCollection("production_gg_week", ref.productionGgWeek, { toRow: ggWeekRow });
-
 const FORECAST_PARTS = ["productLoading", "sscc", "pci", "gg78", "snSs2", "pscBf", "buffaloFeeder", "screening"];
 const FORECAST_COLS = { productLoading: "product_loading", sscc: "sscc", pci: "pci", gg78: "gg78", snSs2: "sn_ss2", pscBf: "psc_bf", buffaloFeeder: "buffalo_feeder", screening: "screening" };
 
@@ -356,7 +342,7 @@ function forecastDailyRow(row) {
   return out;
 }
 function forecastDailyPayload(input, previous = {}) {
-  const workDate = str(input.date ?? input.work_date, previous.date);
+  const workDate = isoDate(input.date ?? input.work_date ?? previous.date, "Forecast date");
   if (!workDate) {
     const err = new Error("Enter a date.");
     err.status = 400;
@@ -372,7 +358,7 @@ function forecastDailyPayload(input, previous = {}) {
   payload.total = total;
   return payload;
 }
-export const forecastDaily = makeCollection("production_forecast_daily", ref.productionForecastDaily, { toRow: forecastDailyRow, toPayload: forecastDailyPayload });
+export const forecastDaily = makeCollection("production_forecast_daily", ref.productionForecastDaily, { toRow: forecastDailyRow, toPayload: forecastDailyPayload, uniqueBy: ["work_date"] });
 
 function forecastWeekRow(row) {
   return {
@@ -395,6 +381,7 @@ function blfDailyRow(row) {
     id: row.id,
     date: row.work_date,
     machine: row.machine,
+    equipment: row.equipment || "",
     opening: row.opening,
     closing: row.closing,
     total: row.total,
@@ -405,25 +392,29 @@ function blfDailyRow(row) {
   };
 }
 function blfDailyPayload(input, previous = {}) {
-  const machine = str(input.machine, previous.machine);
+  const machine = machineReference(input.machine ?? previous.machine);
   if (!machine) {
     const err = new Error("Enter a machine.");
     err.status = 400;
     throw err;
   }
+  const opening = numberValue(input.opening ?? previous.opening, "Opening hours");
+  const closing = numberValue(input.closing ?? previous.closing, "Closing hours");
+  if (closing < opening) throw invalid("Closing hours must be greater than or equal to opening hours.");
   return {
-    work_date: str(input.date ?? input.work_date, previous.date),
+    work_date: isoDate(input.date ?? input.work_date ?? previous.date, "Capture date"),
     machine,
-    opening: cnum(input.opening ?? previous.opening),
-    closing: cnum(input.closing ?? previous.closing),
-    total: cnum(input.total ?? previous.total),
+    equipment: optStr(input.equipment, previous.equipment),
+    opening,
+    closing,
+    total: closing - opening,
     downtime: cnum(input.downtime ?? previous.downtime),
     standby: cnum(input.standby ?? previous.standby),
     pm: cnum(input.pm ?? previous.pm),
     notes: optStr(input.notes, previous.notes),
   };
 }
-export const blfDaily = makeCollection("production_blf_daily", ref.productionBlfDaily, { toRow: blfDailyRow, toPayload: blfDailyPayload });
+export const blfDaily = makeCollection("production_blf_daily", ref.productionBlfDaily, { toRow: blfDailyRow, toPayload: blfDailyPayload, uniqueBy: ["work_date", "machine"] });
 
 function ggHoursRow(row) {
   return { id: row.id, machine: row.machine, total: row.total, downtime: row.downtime, standby: row.standby, pm: row.pm, status: row.status };

@@ -3,6 +3,7 @@ import * as ref from "../data/referenceCatalog.js";
 import { recordSystemEvent } from "./notifications.js";
 import { deleteRow, insertRow, readTable, updateRow } from "./store.js";
 import { makeCollection, num as cnum, optStr, str } from "./collectionService.js";
+import { invalid, numberValue } from "./validation.js";
 
 const SEVERITY_RANK = { Critical: 0, Major: 1, Moderate: 2, Minor: 3 };
 
@@ -68,12 +69,13 @@ function longestDowntime(items) {
 
 export async function getBreakdowns() {
   const items = await readItems();
-  const longest = longestDowntime(items);
+  const open = items.filter((row) => !["Closed", "Completed", "Resolved", "Repaired", "Operational", "Returned to Service"].includes(row.status));
+  const longest = longestDowntime(open);
   return {
     items,
     kpis: {
-      open: items.length,
-      critical: items.filter((row) => row.severity === "Critical").length,
+      open: open.length,
+      critical: open.filter((row) => row.severity === "Critical").length,
       longest: longest.value,
       longestHint: longest.hint,
       inventory: 0,
@@ -140,7 +142,7 @@ export async function removeBreakdown(id, actor = null) {
 // ---------------------------------------------------------------------------
 
 function inventoryRow(row) {
-  return { id: row.id, site: row.site, category: row.category, part: row.part, desc: row.description, qty: row.qty, equipment: row.equipment, status: row.status };
+  return { id: row.id, site: row.site, category: row.category, part: row.part, desc: row.description, qty: row.qty, equipment: row.equipment, supplier: row.supplier || "", status: row.status };
 }
 function inventoryPayload(input, previous = {}) {
   const site = str(input.site, previous.site);
@@ -155,13 +157,19 @@ function inventoryPayload(input, previous = {}) {
     err.status = 400;
     throw err;
   }
+  const qty = str(input.qty, previous.qty || "0");
+  const unchangedLegacy = previous.qty != null && qty === String(previous.qty);
+  if (!unchangedLegacy && !/^\d+$/.test(qty) && !/^\d+\s*x\s*\d+(?:\.\d+)?\s*(?:l|kg)$/i.test(qty)) {
+    throw invalid("Enter a whole quantity or a pack quantity such as 2 x 20L.");
+  }
   return {
     site,
     category: optStr(input.category, previous.category),
     part: optStr(input.part, previous.part),
     description: desc,
-    qty: optStr(input.qty, previous.qty),
+    qty,
     equipment: optStr(input.equipment, previous.equipment),
+    supplier: optStr(input.supplier, previous.supplier),
     status: optStr(input.status, previous.status) || "In Stock",
   };
 }
@@ -181,6 +189,34 @@ export async function listCriticalSpares() {
 }
 
 function availabilityRow(row) {
-  return { id: row.id, plant: row.plant, type: row.type, hoursWorked: row.hours_worked, breakdownHours: row.breakdown_hours, failures: row.failures, availability: row.availability, status: row.status };
+  const worked = Number(row.hours_worked) || 0;
+  const downtime = Number(row.breakdown_hours) || 0;
+  const total = worked + downtime;
+  const percentage = total ? Number(((worked / total) * 100).toFixed(1)) : null;
+  return {
+    id: row.id, plant: row.plant, type: row.type, hoursWorked: worked, breakdownHours: downtime, failures: row.failures,
+    availability: percentage == null ? "—" : `${percentage}%`,
+    status: percentage == null ? "No Hours" : percentage >= 90 ? "On Target" : percentage >= 80 ? "Below Target" : "Critical",
+  };
 }
-export const availability = makeCollection("breakdowns_availability", ref.breakdownsAvailability, { toRow: availabilityRow });
+function availabilityPayload(input, previous = {}) {
+  const plant = str(input.plant, previous.plant).toUpperCase();
+  if (!plant) throw invalid("Enter a machine or fleet number.");
+  const hoursWorked = numberValue(input.hoursWorked ?? previous.hoursWorked, "Hours worked");
+  const breakdownHours = numberValue(input.breakdownHours ?? previous.breakdownHours, "Breakdown hours");
+  const failures = numberValue(input.failures ?? previous.failures, "Failures");
+  if (!Number.isInteger(failures)) throw invalid("Failures must be a whole number.");
+  const captured = hoursWorked + breakdownHours;
+  if (!captured) throw invalid("Capture worked or breakdown hours before calculating availability.");
+  const percentage = Number(((hoursWorked / captured) * 100).toFixed(1));
+  return {
+    plant,
+    type: optStr(input.type, previous.type),
+    hours_worked: hoursWorked,
+    breakdown_hours: breakdownHours,
+    failures,
+    availability: `${percentage}%`,
+    status: percentage >= 90 ? "On Target" : percentage >= 80 ? "Below Target" : "Critical",
+  };
+}
+export const availability = makeCollection("breakdowns_availability", ref.breakdownsAvailability, { toRow: availabilityRow, toPayload: availabilityPayload });

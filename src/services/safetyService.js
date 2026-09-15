@@ -1,8 +1,11 @@
+import { randomUUID } from "node:crypto";
 import * as catalog from "../data/catalog.js";
 import * as ref from "../data/referenceCatalog.js";
 import { recordSystemEvent } from "./notifications.js";
 import { deleteRow, insertRow, readTable, updateRow } from "./store.js";
 import { makeCollection, optStr, str } from "./collectionService.js";
+import { invalid, isoDate } from "./validation.js";
+import { summarizeSafetyMonths } from "./safetyMonthlyReport.js";
 
 function toAction(row) {
   return {
@@ -139,25 +142,18 @@ export async function removeSafety(id, actor = null) {
 function performanceRow(row) {
   return { id: row.id, indicator: row.indicator, result: row.result, status: row.status, comment: row.comment };
 }
-export const performance = makeCollection("safety_performance", ref.safetyPerformance, { toRow: performanceRow });
-
-function monthlyReportRow(row) {
-  return {
-    id: row.id,
-    month: row.month,
-    scheduled: row.scheduled,
-    notStarted: row.not_started,
-    inProgress: row.in_progress,
-    completed: row.completed,
-    na: row.na,
-    completedOverdue: row.completed_overdue,
-    overdue: row.overdue,
-    open: row.open,
-    closedRate: row.closed_rate,
-    total: row.total,
-  };
+function performancePayload(input, previous = {}) {
+  const indicator = str(input.indicator, previous.indicator);
+  const result = str(input.result, previous.result);
+  const status = str(input.status, previous.status || "Monitor");
+  if (!indicator) throw invalid("Enter a safety indicator.");
+  if (!result) throw invalid("Enter the measured result, including its period and unit where applicable.");
+  if (!["On Target", "Below Target", "Monitor", "Critical", "Completed"].includes(status)) throw invalid("Select a valid indicator status.");
+  return { indicator, result, status, comment: optStr(input.comment, previous.comment) };
 }
-export const monthlyReport = makeCollection("safety_monthly_report", ref.safetyMonthlyReport, { toRow: monthlyReportRow });
+export const performance = makeCollection("safety_performance", ref.safetyPerformance, { toRow: performanceRow, toPayload: performancePayload });
+
+export const monthlyReport = { list: async () => summarizeSafetyMonths(await individualActions.list()) };
 
 function individualRow(row) {
   return {
@@ -177,6 +173,7 @@ function individualRow(row) {
     person: row.person,
     evidence: row.evidence,
     verified: row.verified,
+    createdAt: row.created_at,
   };
 }
 function individualPayload(input, previous = {}) {
@@ -187,7 +184,7 @@ function individualPayload(input, previous = {}) {
     throw err;
   }
   return {
-    ref: previous.ref || `SA-${Date.now().toString().slice(-6)}`,
+    ref: previous.ref || `SA-${randomUUID().slice(0, 8).toUpperCase()}`,
     section: optStr(input.section, previous.section),
     location: optStr(input.location, previous.location),
     function_area: optStr(input.function, previous.function),
@@ -196,8 +193,8 @@ function individualPayload(input, previous = {}) {
     action,
     type: optStr(input.type, previous.type),
     category: optStr(input.category, previous.category),
-    start_date: optStr(input.start, previous.start),
-    due_date: optStr(input.due, previous.due),
+    start_date: isoDate(input.start ?? previous.start ?? (previous.id ? "" : new Date()), "Start date", { required: false }),
+    due_date: isoDate(input.due ?? previous.due, "Due date", { required: false }),
     status: optStr(input.status, previous.status) || "Not Yet Assessed",
     person: optStr(input.person, previous.person),
     evidence: optStr(input.evidence, previous.evidence),

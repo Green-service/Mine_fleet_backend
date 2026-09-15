@@ -4,6 +4,8 @@ import { deleteRow, insertRow, readTable, updateRow } from "./store.js";
 import { assessAssetCondition } from "./assetCondition.js";
 import { buildAssetFinance } from "./assetFinance.js";
 import { deleteAssetPhotos, isPhotoRef, resolveAssetPhotos } from "./storageService.js";
+import { invalid, isoDate, numberValue, validateInput } from "./validation.js";
+import { syncBusinessCatalog } from "./businessesService.js";
 
 const VEHICLE_STATUSES = ["Active", "Workshop", "Standby", "Sold"];
 const PROPERTY_STATUSES = ["Active", "Vacant", "Under renovation", "Sold"];
@@ -11,6 +13,7 @@ const VEHICLE_TYPES = ["Sedan", "SUV", "Hatchback", "Bakkie", "Minibus"];
 const PROPERTY_TYPES = ["House", "Flat", "Stand", "Commercial", "Land", "Other"];
 const KINDS = ["vehicle", "property"];
 const BIN_RETENTION_DAYS = 30;
+const SITES = ["Grootegeluk", "Belfast", "Medupi", "Head Office"];
 
 function isProperty(input = {}) {
   const kind = input.kind ?? input.asset_kind;
@@ -108,6 +111,7 @@ function toAsset(row, driverName = "", finance = null) {
     assetCode: row.asset_code || row.assetCode || "",
     makeModel: row.make_model || row.makeModel || "",
     business: row.business || "Bolt rides",
+    site: SITES.includes(row.site) ? row.site : row.business || SITES[0],
     type: typesFor(kind).includes(row.type) ? row.type : defaultType,
     purchaseCost,
     purchaseCostLabel: `R ${purchaseCost.toLocaleString("en-ZA")}`,
@@ -140,10 +144,12 @@ function toAsset(row, driverName = "", finance = null) {
 }
 
 function persistAsset(input, previous = {}) {
+  validateInput("assets", input);
+  if (input.kind !== undefined && !KINDS.includes(input.kind)) throw invalid("Choose a valid asset kind.");
   const kind = KINDS.includes(input.kind) ? input.kind : KINDS.includes(previous.kind) ? previous.kind : "vehicle";
   const property = kind === "property";
-  const assetCode = String(input.assetCode || input.asset_code || previous.assetCode || "").trim();
-  const makeModel = String(input.makeModel || input.make_model || previous.makeModel || "").trim();
+  const assetCode = String(input.assetCode ?? input.asset_code ?? previous.assetCode ?? "").trim();
+  const makeModel = String(input.makeModel ?? input.make_model ?? previous.makeModel ?? "").trim();
   if (!assetCode) {
     const err = new Error(property ? "Property reference is required." : "Registration or asset code is required.");
     err.status = 400;
@@ -155,30 +161,44 @@ function persistAsset(input, previous = {}) {
     throw err;
   }
   const business = String(input.business || previous.business || "Bolt rides").trim();
+  const site = String(input.site ?? previous.site ?? SITES[0]).trim();
   const photos = input.photos !== undefined ? normalizePhotos(input.photos) : normalizePhotos(previous.photos);
   const allowedTypes = typesFor(kind);
   const allowedStatuses = statusesFor(kind);
+  if (input.type !== undefined && !allowedTypes.includes(input.type)) throw invalid("Choose a valid asset type.");
+  if (input.status !== undefined && !allowedStatuses.includes(input.status)) throw invalid("Choose a valid asset status.");
+  const assignedDriverId = "assignedDriverId" in input || "assigned_driver_id" in input
+    ? input.assignedDriverId ?? input.assigned_driver_id ?? null
+    : previous.assignedDriverId ?? null;
+  if (assignedDriverId !== null && typeof assignedDriverId !== "string") throw invalid("Choose a driver from the register.");
   return {
     kind,
     asset_code: property ? assetCode.toUpperCase() : assetCode.toUpperCase(),
     make_model: makeModel,
+    site: SITES.includes(site) ? site : SITES[0],
     business: businessOptions().includes(business) ? business : catalog.defaultBusinessName,
     type: allowedTypes.includes(input.type) ? input.type : previous.type || (property ? "House" : "Sedan"),
-    odometer_km: property ? 0 : num(input.odometerKm ?? input.odometer_km ?? previous.odometerKm),
-    next_service_km: property ? 0 : num(input.nextServiceKm ?? input.next_service_km ?? previous.nextServiceKm),
+    odometer_km: property ? 0 : numberValue(input.odometerKm ?? input.odometer_km ?? previous.odometerKm, "Odometer"),
+    next_service_km: property ? 0 : numberValue(input.nextServiceKm ?? input.next_service_km ?? previous.nextServiceKm, "Next service kilometres"),
     next_service_date: property
       ? null
-      : toIsoDate(input.nextServiceDateIso ?? input.next_service_date ?? previous.nextServiceDateIso) || null,
-    service_interval_km: property ? 0 : num(input.serviceIntervalKm ?? input.service_interval_km ?? previous.serviceIntervalKm) || 15000,
+      : isoDate(input.nextServiceDateIso ?? input.next_service_date ?? previous.nextServiceDateIso, "Next service date", { required: false }),
+    service_interval_km: property ? 0 : numberValue(input.serviceIntervalKm ?? input.service_interval_km ?? previous.serviceIntervalKm, "Service interval", { min: 1, fallback: 15000 }),
     status: allowedStatuses.includes(input.status) ? input.status : previous.status || "Active",
-    assigned_driver_id: property ? null : input.assignedDriverId ?? input.assigned_driver_id ?? previous.assignedDriverId ?? null,
-    purchase_cost: num(input.purchaseCost ?? input.purchase_cost ?? previous.purchaseCost),
+    assigned_driver_id: property ? null : assignedDriverId?.trim() || null,
+    purchase_cost: numberValue(input.purchaseCost ?? input.purchase_cost ?? previous.purchaseCost, "Purchase cost"),
     photos,
   };
 }
 
 async function readDriversRaw() {
   return readTable("drivers", catalog.drivers);
+}
+
+async function validateAssignedDriver(id) {
+  if (!id) return;
+  const drivers = await readDriversRaw();
+  if (!drivers.some((driver) => driver.id === id)) throw Object.assign(new Error("Selected driver was not found. Refresh the driver register."), { status: 404 });
 }
 
 async function syncAssetDriver(assetId, driverId) {
@@ -260,12 +280,14 @@ async function readBinAssetsRaw() {
 }
 
 export async function getAssets() {
-  const [rows, binRows, driverMap, logs] = await Promise.all([
+  const [rows, binRows, driverMap, logs, businesses] = await Promise.all([
     readAssetsRaw(),
     readBinAssetsRaw(),
     readDriverMap(),
     readTable("asset_logs", catalog.assetLogs),
+    readTable("businesses", catalog.businesses),
   ]);
+  syncBusinessCatalog(businesses);
   const assets = rows
     .map((row) => {
       const finance = buildAssetFinance(row, logs);
@@ -292,7 +314,8 @@ export async function getAssets() {
         expiringSoon: binItems.filter((row) => row.daysLeft <= 7).length,
       },
     },
-    businesses: businessOptions(),
+    businesses: businesses.map((row) => row.name).filter(Boolean),
+    sites: SITES,
     vehicleTypes: VEHICLE_TYPES,
     propertyTypes: PROPERTY_TYPES,
     vehicleStatuses: VEHICLE_STATUSES,
@@ -325,6 +348,8 @@ export async function getAssetBin() {
 }
 
 export async function createAsset(body, actor = null) {
+  const payload = persistAsset(body);
+  await validateAssignedDriver(payload.assigned_driver_id);
   const property = isProperty(body);
   const incoming = normalizePhotos(body.photos);
   if (!property && !incoming.length) {
@@ -333,6 +358,8 @@ export async function createAsset(body, actor = null) {
     throw err;
   }
 
+  const existing = (await readAssetsRaw()).find((row) => (row.asset_code || row.assetCode) === payload.asset_code);
+  if (existing) throw Object.assign(new Error("That registration is already on the register."), { status: 409 });
   const id = crypto.randomUUID();
   const photoUrls = incoming.length ? await resolveAssetPhotos(incoming, id) : [];
   if (!property && !photoUrls.length) {
@@ -341,16 +368,10 @@ export async function createAsset(body, actor = null) {
     throw err;
   }
 
-  const payload = persistAsset({ ...body, photos: photoUrls });
-  const existing = (await readAssetsRaw()).find((row) => (row.asset_code || row.assetCode) === payload.asset_code);
-  if (existing) {
-    const err = new Error("That registration is already on the register.");
-    err.status = 409;
-    throw err;
-  }
+  payload.photos = photoUrls;
 
   const saved = await insertRow("assets", { ...payload, id }, catalog.assets);
-  const assignedDriverId = payload.kind === "property" ? null : body.assignedDriverId || body.assigned_driver_id || null;
+  const assignedDriverId = payload.assigned_driver_id;
   if (assignedDriverId) {
     await syncAssetDriver(id, assignedDriverId);
   }
@@ -379,32 +400,29 @@ export async function updateAsset(id, body, actor = null) {
     throw err;
   }
 
+  // Reject invalid form data and missing relationships before photo uploads or
+  // any database mutation can leave behind a partially saved asset.
+  const validated = persistAsset(body, toAsset(previous));
+  await validateAssignedDriver(validated.assigned_driver_id);
+  if (rows.some((row) => (row.asset_code || row.assetCode) === validated.asset_code && row.id !== id)) {
+    throw Object.assign(new Error("That registration is already on the register."), { status: 409 });
+  }
+
   const previousPhotos = normalizePhotos(previous.photos);
   const incoming = body.photos !== undefined ? normalizePhotos(body.photos) : previousPhotos;
   const photoUrls = await resolveAssetPhotos(incoming, id);
-  const prevKind = KINDS.includes(previous.kind) ? previous.kind : "vehicle";
-  const nextKind = KINDS.includes(body.kind) ? body.kind : prevKind;
   const prevDriverId = previous.assigned_driver_id ?? previous.assignedDriverId ?? null;
-  const nextDriverId = nextKind === "property"
-    ? null
-    : "assignedDriverId" in body || "assigned_driver_id" in body
-      ? (body.assignedDriverId || body.assigned_driver_id || null)
-      : prevDriverId;
+  const nextDriverId = validated.assigned_driver_id;
 
-  const payload = persistAsset({ ...body, photos: photoUrls, assignedDriverId: nextDriverId }, toAsset(previous));
+  const payload = { ...validated, photos: photoUrls };
 
   const removedPhotos = previousPhotos.filter(
     (url) => /^https?:\/\//i.test(url) && !photoUrls.includes(url),
   );
-  if (removedPhotos.length) await deleteAssetPhotos(removedPhotos);
-
-  const clash = rows.find((row) => (row.asset_code || row.assetCode) === payload.asset_code && row.id !== id);
-  if (clash) {
-    const err = new Error("That registration is already on the register.");
-    err.status = 409;
-    throw err;
-  }
   const saved = await updateRow("assets", id, payload, catalog.assets);
+  if (removedPhotos.length) {
+    await deleteAssetPhotos(removedPhotos).catch(() => console.warn("[assets] Saved photo references; unused photo cleanup will need to be retried."));
+  }
   if (String(nextDriverId || "") !== String(prevDriverId || "")) {
     await syncAssetDriver(id, nextDriverId);
   }

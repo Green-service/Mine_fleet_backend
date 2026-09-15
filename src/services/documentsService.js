@@ -4,6 +4,7 @@ import { resolvePortfolioDocument } from "./storageService.js";
 import { recordSystemEvent } from "./notifications.js";
 
 const CATEGORIES = ["General", "Contracts", "Finance", "Compliance", "Insurance", "Property", "Fleet"];
+const SITES = ["Grootegeluk", "Belfast", "Medupi", "Head Office"];
 
 function formatSize(bytes) {
   const n = Number(bytes) || 0;
@@ -23,7 +24,8 @@ function toDocument(row) {
   return {
     id: row.id,
     title: row.title || row.file_name || row.fileName || "Document",
-    business: row.business || "—",
+    site: row.site || row.business || "—",
+    business: row.business || row.site || "—",
     category: row.category || "General",
     fileName: row.file_name || row.fileName || "",
     fileUrl: row.file_url || row.fileUrl || "",
@@ -43,6 +45,7 @@ export async function getDocuments() {
   const businesses = businessRows.map((row) => row.name).filter(Boolean);
   return {
     documents,
+    sites: SITES,
     businesses,
     categories: CATEGORIES,
     kpis: {
@@ -86,6 +89,7 @@ export async function createDocument(body, actor = null) {
   const payload = {
     id,
     title,
+    site: SITES.includes(body.site) ? body.site : SITES[0],
     business: String(body.business || businessOptions[0] || "").trim(),
     category: CATEGORIES.includes(body.category) ? body.category : "General",
     file_name: fileName,

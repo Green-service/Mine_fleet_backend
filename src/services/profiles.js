@@ -15,6 +15,7 @@ function initialsFrom(name, email) {
  * Returns null if there's no matching profile (auth account exists but was
  * never provisioned into the app) or the account has been deactivated. */
 export async function loadActor(userId) {
+  if (!supabase) return null;
   const { data: profile, error: perr } = await supabase.from("profiles").select("*").eq("id", userId).maybeSingle();
   if (perr) throw Object.assign(new Error("Could not load your account profile. Contact Head Office to check the server configuration."), { status: 503 });
   if (!profile) return null;

@@ -2,6 +2,9 @@ import * as catalog from "../data/catalog.js";
 import * as ref from "../data/referenceCatalog.js";
 import { insertRow, readTable } from "./store.js";
 import { makeCollection, num as cnum, optStr, str } from "./collectionService.js";
+import { createActionTracker } from "./actionTrackerService.js";
+
+export const hrActionTracker = createActionTracker("hr_action_tracker", "HR");
 
 function num(value) {
   const n = Number(String(value ?? "").replace(/[^\d.-]/g, ""));
@@ -257,7 +260,7 @@ function increasePayload(input, previous = {}) {
   }
   return {
     employee,
-    employee_code: optStr(input.id, previous.employeeId),
+    employee_code: optStr(input.employeeId ?? (previous.id ? undefined : input.id), previous.employeeId ?? previous.employee_code),
     department: optStr(input.department, previous.department),
     title: optStr(input.title, previous.title),
     work_date: optStr(input.date, previous.date),
@@ -281,7 +284,7 @@ function promotionPayload(input, previous = {}) {
   }
   return {
     employee, new_title: newTitle,
-    employee_code: optStr(input.id, previous.employeeId),
+    employee_code: optStr(input.employeeId ?? (previous.id ? undefined : input.id), previous.employeeId ?? previous.employee_code),
     department: optStr(input.department, previous.department),
     old_title: optStr(input.oldTitle, previous.oldTitle),
     work_date: optStr(input.date, previous.date),

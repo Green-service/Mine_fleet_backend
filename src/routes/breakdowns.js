@@ -47,4 +47,4 @@ breakdownsRouter.get("/critical-spares", async (_req, res, next) => {
 });
 
 mountCollection(breakdownsRouter, "/inventory", inventory);
-mountCollection(breakdownsRouter, "/availability", availability, { readOnly: true });
+mountCollection(breakdownsRouter, "/availability", availability);

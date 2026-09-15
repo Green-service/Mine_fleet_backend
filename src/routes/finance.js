@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { costActions, createMachine, getFinance, removeMachine, updateMachine } from "../services/financeService.js";
+import { costActions, createMachine, getFinance, removeMachine, updateMachine, financeActionTracker } from "../services/financeService.js";
 import { mountCollection } from "./collectionRoutes.js";
 
 export const financeRouter = Router();
@@ -37,3 +37,4 @@ financeRouter.delete("/:id", async (req, res, next) => {
 });
 
 mountCollection(financeRouter, "/cost-actions", costActions);
+mountCollection(financeRouter, "/action-tracker", financeActionTracker);

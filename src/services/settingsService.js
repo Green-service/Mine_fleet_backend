@@ -1,5 +1,6 @@
 import * as catalog from "../data/catalog.js";
-import { readTable, updateRow } from "./store.js";
+import { insertRow, readTable, updateRow } from "./store.js";
+import { numberValue } from "./validation.js";
 
 const DEFAULTS = {
   id: "default",
@@ -25,31 +26,32 @@ function toSettings(row) {
 function fromPatch(body, previous) {
   return {
     default_site: String(body.defaultBusiness ?? body.defaultSite ?? previous.default_site ?? DEFAULTS.default_site).trim(),
-    diesel_cost_per_litre: Number(body.dieselCostPerLitre ?? previous.diesel_cost_per_litre ?? DEFAULTS.diesel_cost_per_litre),
-    availability_target: Number(
-      body.fleetUtilisationTarget ?? body.availabilityTarget ?? previous.availability_target ?? DEFAULTS.fleet_utilisation_target,
-    ),
+    diesel_cost_per_litre: numberValue(body.dieselCostPerLitre ?? previous.diesel_cost_per_litre ?? DEFAULTS.diesel_cost_per_litre, "Diesel cost per litre"),
+    availability_target: numberValue(body.fleetUtilisationTarget ?? body.availabilityTarget ?? previous.availability_target ?? DEFAULTS.fleet_utilisation_target, "Fleet utilisation target", { max: 100 }),
+    updated_at: new Date().toISOString(),
   };
 }
 
 async function readSettingsRow() {
   const rows = await readTable("app_settings", [catalog.appSettings]);
-  return rows[0] || catalog.appSettings;
+  return rows[0] || null;
 }
 
 export async function getSettings() {
-  return toSettings(await readSettingsRow());
+  return toSettings(await readSettingsRow() || catalog.appSettings);
 }
 
 export async function patchSettings(body) {
   const current = await readSettingsRow();
-  const payload = fromPatch(body || {}, current);
+  const payload = fromPatch(body || {}, current || DEFAULTS);
   if (!payload.default_site) {
     const err = new Error("Default business is required.");
     err.status = 400;
     throw err;
   }
-  const saved = await updateRow("app_settings", current.id || "default", payload, [catalog.appSettings]);
+  const saved = current
+    ? await updateRow("app_settings", current.id || "default", payload, [catalog.appSettings])
+    : await insertRow("app_settings", { id: "default", ...payload }, [catalog.appSettings]);
   Object.assign(catalog.appSettings, saved);
   return toSettings({ ...current, ...saved, ...payload });
 }

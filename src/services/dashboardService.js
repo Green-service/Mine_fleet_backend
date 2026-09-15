@@ -2,6 +2,7 @@ import { fullRegister, getMaintenance } from "./maintenanceService.js";
 import { getBreakdowns, listCriticalSpares } from "./breakdownsService.js";
 import { getSafety } from "./safetyService.js";
 import { getBoard } from "./productionService.js";
+import { getMachineHours } from "./machineHoursService.js";
 import { getFinance } from "./financeService.js";
 import { getSettings } from "./settingsService.js";
 
@@ -29,30 +30,32 @@ async function fleetAvailabilityKpi() {
   };
 }
 
-async function fleetUtilisationKpi() {
-  const { machineHoursBlf } = await getBoard();
-  const withHours = machineHoursBlf.filter((row) => num(row.hours) + num(row.downtime) + num(row.standby) + num(row.pm) > 0);
-  if (!withHours.length) {
+export function buildFleetUtilisationKpi({ totals }) {
+  const denominator = num(totals.hours) + num(totals.downtime) + num(totals.standby) + num(totals.pm);
+  if (!denominator) {
     return {
       key: "utilisation",
       label: "Fleet Utilisation",
       value: "—",
-      hint: "No machine hours captured yet",
+      hint: "No dated machine hours captured this month",
       tone: "navy",
     };
   }
-  const avg = withHours.reduce((sum, row) => {
-    const denom = num(row.hours) + num(row.downtime) + num(row.standby) + num(row.pm);
-    return sum + (denom ? (num(row.hours) / denom) * 100 : 0);
-  }, 0) / withHours.length;
-  const value = Number(avg.toFixed(1));
+  const value = Number(((num(totals.hours) / denominator) * 100).toFixed(1));
   return {
     key: "utilisation",
     label: "Fleet Utilisation",
     value: `${value}%`,
-    hint: `Based on ${withHours.length} captured machine${withHours.length === 1 ? "" : "s"}`,
+    hint: `Month to date · ${totals.datedCount} dated capture${totals.datedCount === 1 ? "" : "s"}`,
     tone: value >= 80 ? "green" : value >= 60 ? "amber" : "red",
   };
+}
+
+async function fleetUtilisationKpi() {
+  const now = new Date();
+  const month = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+  const report = await getMachineHours({ site: "All sites", from: `${month}-01`, to: `${month}-${String(now.getDate()).padStart(2, "0")}` });
+  return buildFleetUtilisationKpi(report);
 }
 
 async function machinesDownKpi() {

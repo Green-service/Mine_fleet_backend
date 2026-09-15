@@ -1,10 +1,9 @@
 import * as catalog from "../data/catalog.js";
-import * as ref from "../data/referenceCatalog.js";
 import { recordSystemEvent } from "./notifications.js";
 import { deleteRow, insertRow, readTable, updateRow } from "./store.js";
-import { makeCollection } from "./collectionService.js";
+import { validateInput, numberValue } from "./validation.js";
 
-const SITES = ["Grootegeluk", "Belfast", "Medupi"];
+const SITES = ["Grootegeluk", "Belfast", "Medupi", "Head Office"];
 const STATUSES = ["Operational", "Monitor", "Breakdown", "Maintenance", "Standby"];
 
 function num(value) {
@@ -42,6 +41,7 @@ function buildClasses(units) {
 }
 
 function persistPayload(input, previous = {}) {
+  validateInput("equipment", input);
   const fleetNo = String(input.fleetNo || input.fleet_no || previous.fleetNo || "").trim().toUpperCase();
   const name = String(input.equipment || previous.equipment || "").trim();
   if (!fleetNo) {
@@ -66,7 +66,7 @@ function persistPayload(input, previous = {}) {
     category: String(input.category || previous.category || "Front-End Loader").trim(),
     site: SITES.includes(site) ? site : "Grootegeluk",
     hours: num(input.hours ?? previous.hours),
-    health: Math.min(100, Math.max(0, num(input.health ?? previous.health ?? 100))),
+    health: numberValue(input.health ?? previous.health ?? 100, "Health", { max: 100 }),
     status: STATUSES.includes(input.status) ? input.status : previous.status || "Operational",
   };
 }
@@ -154,12 +154,14 @@ export async function removeUnit(id, actor = null) {
 // Static/historical registers migrated off local component state
 // ---------------------------------------------------------------------------
 
-function summaryRow(row) {
-  return { id: row.id, type: row.type, qty: row.qty };
-}
-export const equipmentSummary = makeCollection("fleet_equipment_summary", ref.fleetEquipmentSummary, { toRow: summaryRow });
+export const equipmentSummary = {
+  async list() {
+    return buildClasses(await readUnits()).map((row) => ({ id: row.category, type: row.category, qty: row.quantity }));
+  },
+};
 
-function plantRegisterRow(row) {
-  return { id: row.id, category: row.category, units: row.units, make: row.make, area: row.area, qty: row.quantity };
-}
-export const plantRegister = makeCollection("fleet_classes", ref.fleetPlantRegister, { toRow: plantRegisterRow });
+export const plantRegister = {
+  async list() {
+    return buildClasses(await readUnits()).map((row) => ({ ...row, id: row.category, qty: row.quantity }));
+  },
+};

@@ -1,14 +1,22 @@
 import { Router } from "express";
 import {
-  byMachine, byType, captureIssue, dailyReconciliation, getDiesel, removeIssue, topConsumers, transactions, updateIssue,
+  byMachine, byType, captureIssue, dailyReconciliation, getDiesel, getDieselRegisters, removeIssue, topConsumers, transactions, updateIssue,
 } from "../services/dieselService.js";
 import { mountCollection } from "./collectionRoutes.js";
 
 export const dieselRouter = Router();
 
-dieselRouter.get("/", async (_req, res, next) => {
+dieselRouter.get("/", async (req, res, next) => {
   try {
-    res.json(await getDiesel());
+    res.json(await getDiesel(req.query));
+  } catch (err) {
+    next(err);
+  }
+});
+
+dieselRouter.get("/registers", async (req, res, next) => {
+  try {
+    res.json(await getDieselRegisters(req.query));
   } catch (err) {
     next(err);
   }

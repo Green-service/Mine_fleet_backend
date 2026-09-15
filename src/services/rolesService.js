@@ -3,6 +3,9 @@ import { env } from "../config/env.js";
 import { supabase } from "../lib/supabase.js";
 import { initialsFrom } from "./profiles.js";
 import { sendInviteEmail } from "./mail.js";
+import * as catalog from "../data/catalog.js";
+import { deleteRow, insertRow, readTable, updateRow } from "./store.js";
+import { numberValue } from "./validation.js";
 
 function dbError(error, fallback = "Database error") {
   const err = new Error(error?.message || fallback);
@@ -35,9 +38,8 @@ function slugify(value) {
 }
 
 async function rolesTable() {
-  const { data, error } = await supabase.from("roles").select("*").order("code", { ascending: true });
-  if (error) throw dbError(error);
-  return data || [];
+  const rows = await readTable("roles", catalog.roles);
+  return rows.sort((a, b) => String(a.code || "").localeCompare(String(b.code || "")));
 }
 
 function nextRoleCode(roles) {
@@ -48,15 +50,14 @@ function nextRoleCode(roles) {
 }
 
 export async function listUsers() {
-  const [{ data: profiles, error: perr }, { data: appUsers, error: uerr }, { data: invites, error: ierr }, roles] = await Promise.all([
-    supabase.from("profiles").select("*"),
-    supabase.from("app_users").select("*"),
-    supabase.from("user_invites").select("*"),
+  const [profiles, appUsers, invites, roles] = await Promise.all([
+    readTable("profiles", []),
+    readTable("app_users", []),
+    readTable("user_invites", catalog.invitedUsers),
     rolesTable(),
   ]);
-  if (perr || uerr || ierr) throw dbError(perr || uerr || ierr);
 
-  const appUserById = new Map((appUsers || []).map((u) => [u.id, u]));
+  const appUserById = new Map((appUsers || []).flatMap((u) => [[u.id, u], ...(u.profile_id ? [[u.profile_id, u]] : [])]));
   const inviteByEmail = new Map((invites || []).map((i) => [i.email, i]));
   const roleNameBySlug = new Map(roles.map((r) => [r.slug, r.name]));
   const demoEmail = env.demoEmail.toLowerCase();
@@ -72,7 +73,7 @@ export async function listUsers() {
       roleSlug: p.role_slug,
       site: invite?.site || "Grootegeluk",
       status: au?.is_active === false ? "Revoked" : invite?.status === "Invited" ? "Invited" : "Active",
-      locked: p.email.toLowerCase() === demoEmail,
+      locked: String(p.email || "").toLowerCase() === demoEmail,
     };
   });
 }
@@ -96,18 +97,21 @@ export async function listRoles() {
 
 export async function createRole(body) {
   const roles = await rolesTable();
+  const name = String(body.name || "").trim();
+  if (!name) throw badRequest("Role name is required.");
   const row = {
     code: body.code || nextRoleCode(roles),
-    name: body.name,
-    slug: body.slug || slugify(body.name),
+    name,
+    slug: body.slug || slugify(name),
     category: body.category || "Operations",
     description: body.description,
-    modules: body.modules || 0,
+    modules: numberValue(body.modules, "Module count"),
     status: body.status || "Active",
     permissions: body.permissions || {},
   };
-  const { data, error } = await supabase.from("roles").insert(row).select().single();
-  if (error) throw dbError(error);
+  if (!Number.isInteger(row.modules)) throw badRequest("Module count must be a whole number.");
+  if (roles.some((role) => role.code === row.code || role.slug === row.slug)) throw Object.assign(new Error("That role code or reference already exists."), { status: 409 });
+  const data = await insertRow("roles", row, catalog.roles);
   return { ...data, users: 0 };
 }
 
@@ -116,28 +120,81 @@ export async function updateRole(id, body) {
   for (const key of ["code", "name", "slug", "category", "description", "status", "permissions", "modules"]) {
     if (body[key] !== undefined) patch[key] = body[key];
   }
-  const { data, error } = await supabase.from("roles").update(patch).eq("id", id).select().maybeSingle();
-  if (error) throw dbError(error);
-  if (!data) throw notFound("Role");
+  const existing = await rolesTable();
+  if (!existing.some((row) => row.id === id)) throw notFound("Role");
+  for (const key of ["name", "code", "slug"]) {
+    if (key in patch) {
+      patch[key] = String(patch[key] ?? "").trim();
+      if (!patch[key]) throw badRequest(`Role ${key} is required.`);
+    }
+  }
+  if (patch.modules !== undefined) {
+    patch.modules = numberValue(patch.modules, "Module count");
+    if (!Number.isInteger(patch.modules)) throw badRequest("Module count must be a whole number.");
+  }
+  if (existing.some((role) => role.id !== id && ((patch.code && role.code === patch.code) || (patch.slug && role.slug === patch.slug)))) throw Object.assign(new Error("That role code or reference already exists."), { status: 409 });
+  const data = await updateRow("roles", id, patch, catalog.roles);
   const roles = await listRoles();
   return roles.find((r) => r.id === id) || data;
 }
 
 export async function removeRole(id) {
-  const { data: role, error } = await supabase.from("roles").select("*").eq("id", id).maybeSingle();
-  if (error) throw dbError(error);
+  const role = (await rolesTable()).find((row) => row.id === id);
   if (!role) throw notFound("Role");
-  if (role.slug === "super-admin") {
-    const users = await listUsers();
-    const stillAssigned = users.some((u) => u.status !== "Revoked" && (u.role === role.name || u.roleSlug === role.slug));
-    if (stillAssigned) throw badRequest(`${role.name} is still assigned to an active user — reassign or revoke them first.`);
-  }
-  const { error: delErr } = await supabase.from("roles").delete().eq("id", id);
-  if (delErr) throw dbError(delErr);
+  const users = await listUsers();
+  if (users.some((user) => user.roleSlug === role.slug)) throw badRequest(`${role.name} is still assigned to a user. Reassign their role first.`);
+  await deleteRow("roles", id, catalog.roles);
   return { ok: true };
 }
 
+async function updateLocalUser(id, body) {
+  const [profiles, appUsers, invites, roles] = await Promise.all([
+    readTable("profiles", []), readTable("app_users", []), readTable("user_invites", catalog.invitedUsers), rolesTable(),
+  ]);
+  const profile = profiles.find((row) => row.id === id);
+  if (!profile) throw notFound("User");
+  if (String(profile.email || "").toLowerCase() === env.demoEmail.toLowerCase()) throw badRequest("Super Admin cannot be edited here.");
+  const patch = {};
+  if (body.name !== undefined) {
+    patch.full_name = String(body.name || "").trim();
+    if (!patch.full_name) throw badRequest("User name is required.");
+  }
+  if (body.role !== undefined) {
+    const role = roles.find((row) => row.name === body.role || row.slug === body.role);
+    if (!role) throw badRequest("Choose an existing role.");
+    patch.role_slug = role.slug;
+  }
+  if (body.status !== undefined && !["Active", "Invited", "Revoked"].includes(body.status)) throw badRequest("Choose a valid user status.");
+  if (body.site !== undefined && !["Grootegeluk", "Belfast", "Medupi", "Head Office"].includes(body.site)) throw badRequest("Choose a valid site.");
+  if (Object.keys(patch).length) await updateRow("profiles", id, patch, []);
+  const appUser = appUsers.find((row) => row.id === id || row.profile_id === id);
+  if (patch.role_slug || body.status !== undefined) {
+    const userPatch = {
+      ...(patch.role_slug ? { role_slug: patch.role_slug } : {}),
+      ...(body.status !== undefined ? { is_active: body.status !== "Revoked" } : {}),
+    };
+    if (appUser) await updateRow("app_users", appUser.id, userPatch, []);
+    else await insertRow("app_users", { id, profile_id: id, email: profile.email, role_slug: profile.role_slug, password_hash: "local-demo-no-login", is_active: true, ...userPatch }, []);
+  }
+  if (body.site !== undefined || body.status !== undefined) {
+    const invite = invites.find((row) => row.email === profile.email);
+    const invitePatch = {
+      ...(body.site !== undefined ? { site: body.site } : {}),
+      ...(body.status !== undefined ? { status: body.status } : {}),
+    };
+    if (invite) await updateRow("user_invites", invite.id, invitePatch, catalog.invitedUsers);
+    else await insertRow("user_invites", {
+      full_name: patch.full_name || profile.full_name, email: profile.email,
+      role_slug: patch.role_slug || profile.role_slug,
+      role_name: roles.find((row) => row.slug === (patch.role_slug || profile.role_slug))?.name || "",
+      status: "Active", ...invitePatch,
+    }, catalog.invitedUsers);
+  }
+  return (await listUsers()).find((user) => user.id === id);
+}
+
 export async function updateUser(id, body) {
+  if (!supabase) return updateLocalUser(id, body);
   const { data: profile, error: perr } = await supabase.from("profiles").select("*").eq("id", id).maybeSingle();
   if (perr) throw dbError(perr);
   if (!profile) throw notFound("User");
@@ -167,6 +224,10 @@ export async function updateUser(id, body) {
 }
 
 export async function revokeUser(id) {
+  if (!supabase) {
+    await updateLocalUser(id, { status: "Revoked" });
+    return { ok: true };
+  }
   const { data: profile, error } = await supabase.from("profiles").select("*").eq("id", id).maybeSingle();
   if (error) throw dbError(error);
   if (!profile) throw notFound("User");
@@ -183,6 +244,7 @@ export async function revokeUser(id) {
 }
 
 export async function inviteUser({ name, email, role, site }) {
+  if (!supabase) throw Object.assign(new Error("Invitations require configured Supabase authentication and email delivery. No invitation was sent."), { status: 503 });
   const fullName = String(name || "").trim();
   const workEmail = String(email || "").trim().toLowerCase();
   const roleName = String(role || "").trim();

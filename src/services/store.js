@@ -1,138 +1,136 @@
 import { supabase } from "../lib/supabase.js";
+import { env } from "../config/env.js";
 import { readRuntime, writeRuntime } from "./persistStore.js";
-
-function demoRow(payload) {
-  return { id: crypto.randomUUID(), created_at: new Date().toISOString(), ...payload };
-}
+import { validatePayload } from "./validation.js";
 
 function notFound() {
-  const err = new Error("Record not found");
-  err.status = 404;
-  return err;
+  return Object.assign(new Error("Record not found"), { status: 404 });
 }
 
-function localRows(table, fallback) {
-  const saved = readRuntime(table);
-  if (saved?.length) return saved;
-  return Array.isArray(fallback) ? [...fallback] : [];
+function databaseError(table, operation, error) {
+  const code = error?.code;
+  let status = 503;
+  let message = `Could not ${operation} ${table.replaceAll("_", " ")}. Check the database connection and try again.`;
+  if (["42P01", "42703", "PGRST204", "PGRST205"].includes(code)) {
+    const migration = ["report_files", "hr_action_tracker", "finance_action_tracker"].includes(table)
+      ? "supabase/repair-report-and-action-trackers.sql" : "supabase/migrate-registers.sql";
+    let project = "the connected Supabase project";
+    try { project = new URL(env.supabaseUrl).hostname; } catch { /* No configured project in local tests. */ }
+    const problem = ["42P01", "PGRST205"].includes(code) ? "is unavailable in the API schema" : "has missing required columns";
+    message = `The table public.${table} ${problem} (${code}). Run the entire ${migration} file in ${project}'s SQL editor, then retry.`;
+  } else if (["42501", "PGRST301", "PGRST302"].includes(code)) {
+    message = "Database access was denied. Check the server Supabase credentials and table permissions.";
+  } else if (code === "23505") {
+    status = 409;
+    message = "A record with these identifying details already exists.";
+  } else if (code === "23503") {
+    status = 409;
+    message = "This record refers to a missing record or is still used by another register.";
+  } else if (["23502", "23514", "22P02", "22007", "22008", "22003"].includes(code)) {
+    status = 400;
+    message = "The database rejected an invalid or missing value. Check the required fields, dates and numbers.";
+  } else if (code === "PGRST116") {
+    return notFound();
+  }
+  return Object.assign(new Error(message), { status, code });
 }
 
-function applyLocal(table, rows, fallbackList) {
-  if (!Array.isArray(fallbackList)) return rows;
-  fallbackList.length = 0;
-  fallbackList.push(...rows);
-  writeRuntime(table, rows);
-  return rows;
-}
-
-function ensureIds(table, rows, fallbackList) {
-  let changed = false;
-  const withIds = rows.map((row) => {
-    if (row.id) return row;
-    changed = true;
-    return { id: crypto.randomUUID(), ...row };
-  });
-  if (changed) applyLocal(table, withIds, fallbackList);
-  return withIds;
-}
-
-const ORDER_COLUMN = {
-  app_settings: "updated_at",
-};
-
-export async function readTable(table, fallback) {
-  const local = localRows(table, fallback);
-
-  if (!supabase) {
-    const rows = local.length ? local : fallback;
-    return ensureIds(table, rows, fallback);
+// Dependency injection keeps tests away from the user's database and registers.
+export function createStore({ database = null, readLocal = readRuntime, writeLocal = writeRuntime } = {}) {
+  function syncMemory(rows, fallback) {
+    if (Array.isArray(fallback)) fallback.splice(0, fallback.length, ...structuredClone(rows));
+  }
+  function localRows(table, fallback) {
+    const saved = readLocal(table);
+    return Array.isArray(saved) ? structuredClone(saved) : Array.isArray(fallback) ? structuredClone(fallback) : [];
   }
 
-  const orderBy = ORDER_COLUMN[table] || "created_at";
-  let query = supabase.from(table).select("*");
-  query = query.order(orderBy, { ascending: false, nullsFirst: false });
-  const { data, error } = await query;
-  if (error) {
-    console.warn(`[supabase] read ${table}: ${error.message} — treating register as empty`);
-    if (Array.isArray(fallback)) {
-      applyLocal(table, [], fallback);
-      return [];
+  function saveLocal(table, rows, fallback) {
+    // Persist first so disk failure cannot leave a successful in-memory write.
+    writeLocal(table, rows);
+    if (Array.isArray(fallback)) fallback.splice(0, fallback.length, ...rows);
+    return rows;
+  }
+
+  async function readTable(table, fallback) {
+    if (database) {
+      const rows = [];
+      let total = null;
+      // Supabase limits a single response. Read every page before calculating
+      // register totals or returning machine history, including older captures.
+      while (true) {
+        const { data, error, count } = await database.from(table).select("*", rows.length ? undefined : { count: "exact" })
+          .order(table === "app_settings" ? "updated_at" : "created_at", { ascending: false, nullsFirst: false })
+          .order("id", { ascending: false })
+          .range(rows.length, rows.length + 999);
+        if (error) throw databaseError(table, "load", error);
+        if (typeof count === "number") total = count;
+        if (!data?.length) break;
+        rows.push(...data);
+        if (total != null && rows.length >= total) break;
+      }
+      syncMemory(rows, fallback);
+      return rows;
     }
-    return fallback;
+    const rows = localRows(table, fallback);
+    if (rows.some((row) => !row.id)) {
+      return saveLocal(table, rows.map((row) => ({ ...row, id: row.id || crypto.randomUUID() })), fallback);
+    }
+    return rows;
   }
 
-  const dbRows = data ?? [];
-  if (Array.isArray(fallback)) {
-    applyLocal(table, dbRows, fallback);
-  }
-  return dbRows;
-}
-
-export async function insertRow(table, payload, fallbackList) {
-  if (supabase) {
-    const { data, error } = await supabase.from(table).insert(payload).select("*").single();
-    if (!error && data) {
-      const rows = localRows(table, fallbackList).filter((row) => row.id !== data.id);
-      rows.unshift(data);
-      applyLocal(table, rows, fallbackList);
+  async function insertRow(table, input, fallback) {
+    const payload = validatePayload(table, input);
+    if (database) {
+      const { data, error } = await database.from(table).insert(payload).select("*").single();
+      if (error || !data) throw databaseError(table, "save", error);
+      syncMemory([data, ...(Array.isArray(fallback) ? fallback.filter((row) => row.id !== data.id) : [])], fallback);
       return data;
     }
-    if (error) {
-      console.warn(`[supabase] insert ${table}: ${error.message} — saving locally instead`);
-    }
+    const row = { ...payload, id: payload.id || crypto.randomUUID(), created_at: new Date().toISOString() };
+    saveLocal(table, [row, ...localRows(table, fallback)], fallback);
+    return row;
   }
 
-  const row = demoRow(payload);
-  const rows = localRows(table, fallbackList);
-  rows.unshift(row);
-  applyLocal(table, rows, fallbackList);
-  return row;
-}
-
-export async function updateRow(table, id, payload, fallbackList) {
-  if (supabase) {
-    const { data, error } = await supabase.from(table).update(payload).eq("id", id).select("*").single();
-    if (!error && data) {
-      const rows = localRows(table, fallbackList).map((row) => (row.id === id ? { ...row, ...data } : row));
-      applyLocal(table, rows, fallbackList);
+  async function updateRow(table, id, input, fallback) {
+    const payload = validatePayload(table, input, { partial: true });
+    if (database) {
+      const { data, error } = await database.from(table).update(payload).eq("id", id).select("*").single();
+      if (error || !data) throw databaseError(table, "update", error);
+      syncMemory(Array.isArray(fallback) ? fallback.map((row) => row.id === id ? data : row) : [], fallback);
       return data;
     }
-    if (error) {
-      console.warn(`[supabase] update ${table}: ${error.message} — updating local copy`);
-    }
+    const rows = localRows(table, fallback);
+    const index = rows.findIndex((row) => row.id === id);
+    if (index < 0) throw notFound();
+    const row = { ...rows[index], ...payload, id };
+    rows[index] = row;
+    saveLocal(table, rows, fallback);
+    return row;
   }
 
-  const rows = localRows(table, fallbackList);
-  const row = rows.find((item) => item.id === id);
-  if (!row) throw notFound();
-  Object.assign(row, payload);
-  applyLocal(table, rows, fallbackList);
-  return row;
-}
-
-export async function deleteRow(table, id, fallbackList) {
-  if (supabase) {
-    const { error } = await supabase.from(table).delete().eq("id", id);
-    if (!error) {
-      const rows = localRows(table, fallbackList).filter((item) => item.id !== id);
-      applyLocal(table, rows, fallbackList);
+  async function deleteRow(table, id, fallback) {
+    if (database) {
+      // Returned IDs distinguish a real deletion from a stale ID or RLS no-op.
+      const { data, error } = await database.from(table).delete().eq("id", id).select("id");
+      if (error) throw databaseError(table, "delete", error);
+      if (!data?.length) throw notFound();
+      syncMemory(Array.isArray(fallback) ? fallback.filter((row) => row.id !== id) : [], fallback);
       return { ok: true };
     }
-    console.warn(`[supabase] delete ${table}: ${error.message} — deleting local copy`);
+    const rows = localRows(table, fallback);
+    const index = rows.findIndex((row) => row.id === id);
+    if (index < 0) throw notFound();
+    rows.splice(index, 1);
+    saveLocal(table, rows, fallback);
+    return { ok: true };
   }
 
-  const rows = localRows(table, fallbackList);
-  const index = rows.findIndex((item) => item.id === id);
-  if (index < 0) throw notFound();
-  rows.splice(index, 1);
-  applyLocal(table, rows, fallbackList);
-  return { ok: true };
+  return { readTable, insertRow, updateRow, deleteRow };
 }
 
+export const { readTable, insertRow, updateRow, deleteRow } = createStore({ database: supabase });
+
 export function persistenceStatus() {
-  return {
-    supabase: Boolean(supabase),
-    localStore: true,
-    runtimeDir: "server/data/runtime",
-  };
+  return { supabase: Boolean(supabase), localStore: !supabase, runtimeDir: "server/data/runtime" };
 }

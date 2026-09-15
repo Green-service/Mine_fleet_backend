@@ -10,7 +10,12 @@ import { readBusinessRows, syncBusinessCatalog } from "./services/businessesServ
 if (!usingSupabase) {
   hydrateCatalog(catalog);
 }
-syncBusinessCatalog(await readBusinessRows());
+try {
+  syncBusinessCatalog(await readBusinessRows());
+} catch (error) {
+  if (usingSupabase) syncBusinessCatalog([]);
+  console.warn(`[startup] Business register could not be loaded: ${error.message}`);
+}
 
 const ALWAYS_ALLOWED_ORIGIN = /^https?:\/\/localhost(:\d+)?$|^https?:\/\/127\.0\.0\.1(:\d+)?$|^https:\/\/([a-z0-9-]+--)?[a-z0-9-]+\.netlify\.app$/i;
 

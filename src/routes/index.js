@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { usingSupabase } from "../config/env.js";
+import { env, usingSupabase } from "../config/env.js";
 import { persistenceStatus } from "../services/store.js";
 import { storageStatus } from "../services/storageService.js";
 import { requireAuth } from "../middleware/requireAuth.js";
@@ -9,7 +9,7 @@ import {
 } from "../services/rolesService.js";
 import {
   ccma, claims, clockEmployee, disciplinary, employees, getHrData, increases, leave,
-  listManpowerTotals, manpower, promotions, recruitment,
+  listManpowerTotals, manpower, promotions, recruitment, hrActionTracker,
 } from "../services/hrService.js";
 import { mountCollection } from "./collectionRoutes.js";
 import { authRouter } from "./auth.js";
@@ -28,6 +28,7 @@ import { assetsRouter } from "./assets.js";
 import { driversRouter } from "./drivers.js";
 import { logRouter } from "./log.js";
 import { documentsRouter } from "./documents.js";
+import { reportsRouter } from "./reports.js";
 import { referenceRouter } from "./reference.js";
 import { dashboardRouter } from "./dashboard.js";
 import { listActivity, listNotifications, listSites } from "../services/inboxService.js";
@@ -40,6 +41,7 @@ router.get("/health", (_req, res) => {
   res.json({
     ok: true,
     supabase: usingSupabase,
+    supabaseHost: usingSupabase ? new URL(env.supabaseUrl).hostname : null,
     storage: storageStatus(),
     persistence: persistenceStatus(),
     time: new Date().toISOString(),
@@ -161,6 +163,7 @@ router.get("/hr/manpower-totals", async (_req, res, next) => {
 });
 
 mountCollection(router, "/hr/manpower", manpower);
+mountCollection(router, "/hr/action-tracker", hrActionTracker);
 mountCollection(router, "/hr/recruitment", recruitment);
 mountCollection(router, "/hr/increases", increases);
 mountCollection(router, "/hr/promotions", promotions);
@@ -170,17 +173,4 @@ mountCollection(router, "/hr/employees", employees);
 mountCollection(router, "/hr/leave", leave);
 mountCollection(router, "/hr/claims", claims);
 
-router.get("/reports", (_req, res) => {
-  res.json({
-    packs: [
-      { id: "exec", title: "Executive monthly report", blurb: "Availability, production, cost and SHEQ on one pack." },
-      { id: "eng", title: "Engineering performance", blurb: "PM compliance, backlog and return-to-service." },
-      { id: "prod", title: "Daily production report", blurb: "GG and Medupi target versus actual with challenges." },
-      { id: "cost", title: "Machine cost report", blurb: "Top cost drivers by fleet number." },
-      { id: "fuel", title: "Fuel consumption report", blurb: "Litres, L/hr and reconciliation exceptions." },
-      { id: "sheq", title: "SHEQ performance report", blurb: "LTI, PTOs, actions and contractor files." },
-      { id: "spares", title: "Critical spares report", blurb: "Stock-outs tied to open breakdowns." },
-      { id: "supplier", title: "Supplier performance", blurb: "PO ageing, delivery and close-out." },
-    ],
-  });
-});
+router.use("/reports", reportsRouter);

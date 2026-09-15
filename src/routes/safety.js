@@ -40,7 +40,7 @@ safetyRouter.delete("/:id", async (req, res, next) => {
   }
 });
 
-mountCollection(safetyRouter, "/performance", performance, { readOnly: true });
+mountCollection(safetyRouter, "/performance", performance);
 mountCollection(safetyRouter, "/monthly-report", monthlyReport, { readOnly: true });
 mountCollection(safetyRouter, "/individual", individualActions);
 

@@ -3,6 +3,7 @@ import { deleteRow, insertRow, readTable, updateRow } from "./store.js";
 import { buildAssetFinance, buildBusinessRollup, money, projectFromLogs } from "./assetFinance.js";
 import { recordSystemEvent } from "./notifications.js";
 import { readBusinessRows } from "./businessesService.js";
+import { invalid, isoDate, numberValue, validateInput } from "./validation.js";
 
 const PERIOD_TYPES = ["weekly", "monthly", "once"];
 const ENTRY_TYPES = ["income", "expense"];
@@ -117,7 +118,15 @@ async function assetMap() {
 }
 
 function persistLog(input, previous = {}, assetRow = null, actor = null) {
-  const assetId = String(input.assetId || input.asset_id || previous.assetId || "").trim();
+  validateInput("asset_logs", input);
+  for (const field of ["income", "deductions", "amount"]) {
+    if (input[field] !== undefined) numberValue(input[field], field.charAt(0).toUpperCase() + field.slice(1));
+  }
+  const submittedEntryType = input.entryType ?? input.entry_type;
+  const submittedPeriodType = input.periodType ?? input.period_type;
+  if (submittedEntryType !== undefined && !ENTRY_TYPES.includes(submittedEntryType)) throw invalid("Choose income or expense.");
+  if (submittedPeriodType !== undefined && !PERIOD_TYPES.includes(submittedPeriodType)) throw invalid("Choose a valid log period.");
+  const assetId = String(input.assetId ?? input.asset_id ?? previous.assetId ?? "").trim();
   if (!assetId) {
     const err = new Error("Select an asset for this log.");
     err.status = 400;
@@ -128,7 +137,7 @@ function persistLog(input, previous = {}, assetRow = null, actor = null) {
     ? (input.entryType || input.entry_type || previous.entryType)
     : "income";
   const expense = entryType === "expense";
-  const periodStart = toIsoDate(input.periodStartIso ?? input.period_start ?? previous.periodStartIso);
+  const periodStart = isoDate(input.periodStartIso ?? input.period_start ?? previous.periodStartIso, "Log date");
   if (!periodStart) {
     const err = new Error("Date is required.");
     err.status = 400;
@@ -136,7 +145,7 @@ function persistLog(input, previous = {}, assetRow = null, actor = null) {
   }
 
   if (expense) {
-    const amount = num(input.amount ?? input.deductions ?? previous.amount ?? previous.deductions);
+    const amount = numberValue(input.amount ?? input.deductions ?? previous.amount ?? previous.deductions, "Expense amount");
     const category = String(input.category || previous.category || "").trim();
     const periodType = ["once", "weekly", "monthly"].includes(input.periodType || input.period_type || previous.periodType)
       ? (input.periodType || input.period_type || previous.periodType)
@@ -170,8 +179,8 @@ function persistLog(input, previous = {}, assetRow = null, actor = null) {
   const periodType = PERIOD_TYPES.includes(input.periodType || input.period_type)
     ? (input.periodType || input.period_type)
     : previous.periodType || "monthly";
-  const income = num(input.income ?? previous.income);
-  const deductions = num(input.deductions ?? previous.deductions);
+  const income = numberValue(input.income ?? previous.income, "Income");
+  const deductions = numberValue(input.deductions ?? previous.deductions, "Deductions");
   if (income <= 0 && deductions <= 0) {
     const err = new Error("Enter income or deductions for this period.");
     err.status = 400;
@@ -256,7 +265,7 @@ export async function getLogData() {
 export async function createLog(body, actor = null) {
   const map = await assetMap();
   const assetRow = map[body.assetId || body.asset_id];
-  if (!assetRow) {
+  if (!assetRow || assetRow.deleted_at || assetRow.deletedAt) {
     const err = new Error("Asset not found");
     err.status = 404;
     throw err;
@@ -297,8 +306,11 @@ export async function updateLog(id, body, actor = null) {
     err.status = 404;
     throw err;
   }
-  const assetId = body.assetId || body.asset_id || previous.asset_id;
+  const assetId = body.assetId ?? body.asset_id ?? previous.asset_id;
   const assetRow = map[assetId];
+  if (!assetRow || (assetId !== previous.asset_id && (assetRow.deleted_at || assetRow.deletedAt))) {
+    throw Object.assign(new Error("Asset not found"), { status: 404 });
+  }
   const payload = persistLog(body, toLog(previous, map), assetRow, actor);
   const saved = await updateRow("asset_logs", id, payload, catalog.assetLogs);
   const log = toLog({ ...previous, ...payload, ...saved, id }, map);

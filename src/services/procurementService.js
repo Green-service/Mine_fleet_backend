@@ -1,6 +1,7 @@
 import * as catalog from "../data/catalog.js";
 import { recordSystemEvent } from "./notifications.js";
 import { deleteRow, insertRow, readTable, updateRow } from "./store.js";
+import { validateInput } from "./validation.js";
 
 function num(value) {
   const n = Number(value ?? 0);
@@ -99,13 +100,14 @@ export async function getProcurement() {
 }
 
 export async function createRequest(body, actor = null) {
+  validateInput("purchase_requests", body);
   const item = String(body.item || "").trim();
   if (!item) {
     const err = new Error("Item description is required.");
     err.status = 400;
     throw err;
   }
-  const requestNo = `PR-2026-${String(80 + catalog.purchaseRequests.length).padStart(3, "0")}`;
+  const requestNo = `PR-${new Date().getFullYear()}-${crypto.randomUUID().slice(0, 8).toUpperCase()}`;
   const payload = {
     request_no: requestNo,
     department: String(body.department || "Engineering").trim(),
@@ -129,6 +131,7 @@ export async function createRequest(body, actor = null) {
 }
 
 export async function updateRequest(id, body) {
+  validateInput("purchase_requests", body);
   const rows = await readTable("purchase_requests", catalog.purchaseRequests);
   const previous = rows.find((row) => row.id === id);
   if (!previous) {
@@ -161,6 +164,7 @@ export async function removeRequest(id) {
 // convention as makeCollection's update(), so date columns stay ISO instead
 // of round-tripping through toOrder()'s display formatting.
 function orderPayload(body, previous = {}) {
+  validateInput("purchase_orders", body);
   const supplier = String(body.supplier ?? previous.supplier ?? "").trim();
   if (!supplier) {
     const err = new Error("Supplier is required.");
@@ -168,23 +172,25 @@ function orderPayload(body, previous = {}) {
     throw err;
   }
   const exclusive = num(body.exclusive ?? previous.exclusive);
-  const vat = num(body.vat ?? previous.vat ?? Math.round(exclusive * 0.15 * 100) / 100);
+  const suppliedVat = body.vat === "" ? null : body.vat ?? previous.vat;
+  const vat = suppliedVat == null ? Math.round(exclusive * 0.15 * 100) / 100 : num(suppliedVat);
+  const deliveryDate = body.delivery ?? previous.delivery_date ?? null;
   return {
     supplier,
     order_no: String(body.orderNo ?? previous.order_no ?? "").trim(),
     exclusive,
     vat,
-    total: num(body.total ?? previous.total ?? exclusive + vat),
+    total: Math.round((exclusive + vat) * 100) / 100,
     status: String(body.status ?? previous.status ?? "Open").trim(),
     order_date: body.date ?? previous.order_date ?? null,
-    delivery_date: body.delivery ?? previous.delivery_date ?? null,
+    delivery_date: ["", "—", "-"].includes(String(deliveryDate ?? "").trim()) ? null : deliveryDate,
     progress: String(body.progress ?? previous.progress ?? "Not captured").trim(),
   };
 }
 
 export async function createOrder(body, actor = null) {
   const payload = orderPayload(body);
-  payload.reference = `PO-2026-${String(60 + catalog.purchaseOrders.length).padStart(3, "0")}`;
+  payload.reference = `PO-${new Date().getFullYear()}-${crypto.randomUUID().slice(0, 8).toUpperCase()}`;
   if (!payload.order_date) payload.order_date = new Date().toISOString();
   const saved = await insertRow("purchase_orders", payload, catalog.purchaseOrders);
   const row = toOrder({ ...payload, ...saved });

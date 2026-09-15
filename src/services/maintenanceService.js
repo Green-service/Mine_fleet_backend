@@ -4,6 +4,7 @@ import { deleteRow, insertRow, readTable, updateRow } from "./store.js";
 import { getAssets } from "./assetsService.js";
 import { notifyAllUsers, recordSystemEvent } from "./notifications.js";
 import { makeCollection, num as cnum, optStr, str } from "./collectionService.js";
+import { invalid, isoDate, numberValue } from "./validation.js";
 function parseDate(value) {
   if (!value) return null;
   if (value instanceof Date && !Number.isNaN(value.getTime())) return value;
@@ -275,10 +276,20 @@ export async function listMachinesNeedingAttention() {
   return rows.filter((row) => row.status && row.status !== "Operational");
 }
 
-function statusByGroupRow(row) {
-  return { id: row.id, group: row.group_name, total: row.total, operational: row.operational, attention: row.attention, pct: row.pct };
-}
-export const statusByGroup = makeCollection("maintenance_status_by_group", ref.maintenanceStatusByGroup, { toRow: statusByGroupRow });
+export const statusByGroup = {
+  async list() {
+    const groups = new Map();
+    for (const row of await fullRegister.list()) {
+      const group = row.machine || "Unclassified";
+      const item = groups.get(group) || { id: group, group, total: 0, operational: 0, attention: 0 };
+      item.total += 1;
+      if (row.status === "Operational") item.operational += 1;
+      else item.attention += 1;
+      groups.set(group, item);
+    }
+    return [...groups.values()].map((row) => ({ ...row, pct: `${(row.operational / row.total * 100).toFixed(1)}%` }));
+  },
+};
 
 function formatHoursLeft(value) {
   // hours_left is stored numeric, but the UI expects a signed label like
@@ -304,7 +315,25 @@ function servicePlanStaticRow(row) {
     notes: row.notes,
   };
 }
-export const servicePlanStatic = makeCollection("service_plans", ref.maintenanceServicePlan, { toRow: servicePlanStaticRow });
+function servicePlanPayload(input, previous = {}) {
+  const fleetNo = str(input.fleetNo ?? input.fleet_no, previous.fleetNo).toUpperCase();
+  if (!fleetNo) throw invalid("Enter a fleet number.");
+  const hours = numberValue(input.hours ?? previous.hours, "Current hours");
+  const nextService = numberValue(input.nextService ?? input.next_service ?? previous.nextService, "Next service hours");
+  const hoursLeft = nextService - hours;
+  return {
+    fleet_no: fleetNo,
+    make: optStr(input.make, previous.make),
+    model: optStr(input.model, previous.model),
+    hours,
+    next_service: nextService,
+    hours_left: hoursLeft,
+    due_date: isoDate(input.planned ?? input.due_date ?? previous.planned, "Planned date", { required: false }),
+    status: hoursLeft < 0 ? "Overdue" : hoursLeft <= 50 ? "Due Soon" : "On Schedule",
+    notes: optStr(input.notes, previous.notes),
+  };
+}
+export const servicePlanStatic = makeCollection("service_plans", ref.maintenanceServicePlan, { toRow: servicePlanStaticRow, toPayload: servicePlanPayload });
 
 function backlogRow(row) {
   return {

@@ -5,7 +5,7 @@ import { storageStatus } from "../services/storageService.js";
 import { requireAuth } from "../middleware/requireAuth.js";
 import { requirePermission } from "../middleware/requirePermission.js";
 import {
-  createRole, inviteUser, listRoles, listUsers, removeRole, revokeUser, updateRole, updateUser,
+  createRole, inviteUser, listRoles, listUsers, permanentlyDeleteUser, removeRole, revokeUser, updateRole, updateUser,
 } from "../services/rolesService.js";
 import {
   ccma, claims, clockEmployee, disciplinary, employees, getHrData, increases, leave,
@@ -127,6 +127,14 @@ router.patch("/hr/users/:id", requirePermission("hr", "edit"), async (req, res, 
 router.delete("/hr/users/:id", requirePermission("hr", "delete"), async (req, res, next) => {
   try {
     res.json(await revokeUser(req.params.id));
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.delete("/hr/users/:id/permanent", requirePermission("hr", "delete"), async (req, res, next) => {
+  try {
+    res.json(await permanentlyDeleteUser(req.params.id));
   } catch (err) {
     next(err);
   }

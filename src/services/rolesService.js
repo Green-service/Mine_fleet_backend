@@ -243,6 +243,38 @@ export async function revokeUser(id) {
   return { ok: true };
 }
 
+export async function permanentlyDeleteUser(id) {
+  if (!supabase) {
+    const [profiles, appUsers, invites] = await Promise.all([
+      readTable("profiles", []), readTable("app_users", []), readTable("user_invites", catalog.invitedUsers),
+    ]);
+    const profile = profiles.find((row) => row.id === id);
+    if (!profile) throw notFound("User");
+    if (String(profile.email || "").toLowerCase() === env.demoEmail.toLowerCase()) throw badRequest("Super Admin cannot be deleted.");
+    await deleteRow("profiles", id, []);
+    for (const row of appUsers.filter((item) => item.id === id || item.profile_id === id)) await deleteRow("app_users", row.id, []);
+    for (const row of invites.filter((item) => item.email === profile.email)) await deleteRow("user_invites", row.id, catalog.invitedUsers);
+    return { ok: true };
+  }
+
+  const { data: profile, error } = await supabase.from("profiles").select("id,email").eq("id", id).maybeSingle();
+  if (error) throw dbError(error);
+  if (!profile) throw notFound("User");
+  if (String(profile.email || "").toLowerCase() === env.demoEmail.toLowerCase()) throw badRequest("Super Admin cannot be deleted.");
+
+  const { data: account, error: accountError } = await supabase.from("app_users").select("is_active").eq("id", id).maybeSingle();
+  if (accountError) throw dbError(accountError);
+  const { error: inviteError } = await supabase.from("user_invites").delete().eq("email", profile.email);
+  if (inviteError) throw dbError(inviteError);
+  const { error: appUserError } = await supabase.from("app_users").delete().eq("id", id);
+  if (appUserError) throw dbError(appUserError);
+  const { error: profileError } = await supabase.from("profiles").delete().eq("id", id);
+  if (profileError) throw dbError(profileError);
+  const { error: authError } = await supabase.auth.admin.deleteUser(id);
+  if (authError) throw dbError(authError, "Could not delete the Supabase Auth account.");
+  return { ok: true };
+}
+
 export async function inviteUser({ name, email, role, site }) {
   if (!supabase) throw Object.assign(new Error("Invitations require configured Supabase authentication and email delivery. No invitation was sent."), { status: 503 });
   const fullName = String(name || "").trim();
